@@ -16,10 +16,17 @@ get_sdg3_health <- function(prj, final_db_year = 2050){
   
   scen_name <- rgcam::listScenarios(prj)
   
-  mort <- rfasst::m3_get_mort_pm25(prj_name = prj,
-                   scen_name = scen_name,
-                   final_db_year = final_db_year,
-                   saveOutput = F)
+  mort <- NULL
+  
+  for(i in scen_name) {
+    
+    mort <- rfasst::m3_get_mort_pm25(prj_name = prj,
+                                     scen_name = i,
+                                     final_db_year = final_db_year,
+                                     saveOutput = F)
+  }
+  
+  mort_fin <- dplyr::bind_rows(mort)
   
 
   return(invisible(mort))
