@@ -10,6 +10,7 @@
                 <comments/>
 <labelRewriteList append-values="false">
                     <level name="GHG">
+                        <rewrite from="afoluCO2" to="CO2"/>
                         <rewrite from="bldCO2" to="CO2"/>
                         <rewrite from="indCO2" to="CO2"/>
                         <rewrite from="indCO2ccs90" to="CO2"/>

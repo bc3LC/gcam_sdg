@@ -75,6 +75,7 @@
                 <xPath buildList="true" dataName="emissions" group="false" sumAll="false">*[@type = 'resource']//*[@type = 'GHG' and @name != 'CO2' and @name != 'CO2_FUG']/emissions/node()</xPath>
 <labelRewriteList append-values="false">
                     <level name="GHG">
+                        <rewrite from="afoluCO2" to="CO2"/>
                         <rewrite from="bldCO2" to="CO2"/>
                         <rewrite from="indCO2" to="CO2"/>
                         <rewrite from="indCO2ccs90" to="CO2"/>
