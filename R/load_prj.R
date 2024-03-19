@@ -47,8 +47,4 @@ load_prj <- function(db_path = NULL, query_path = "./inst/extdata", db_name = NU
   }
   
 
-  
-
-  return(invisible(mort))
-  
 } 
