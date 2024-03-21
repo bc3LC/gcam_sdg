@@ -20,10 +20,10 @@ get_sdg3_health <- function(prj, final_db_year = 2050){
   
   for(i in scen_name) {
     
-    mort_pre <- rfasst::m3_get_mort_pm25(prj_name = prj,
-                                     scen_name = i,
-                                     final_db_year = final_db_year,
-                                     saveOutput = F) %>%
+    mort_pre <- rfasst::m3_get_mort_pm25(prj = prj,
+                                         scen_name = i,
+                                         final_db_year = final_db_year,
+                                         saveOutput = F) %>%
       # select the only one model (GBD)
       dplyr::select(region, year, age, disease, mort = GBD) %>%
       # Aggregate to region-level
@@ -85,10 +85,10 @@ get_sdg3_health <- function(prj, final_db_year = 2050){
       
     #--------------------
       # ADD O3
-    o3_mort_pre <- rfasst::m3_get_mort_o3(prj_name = prj,
-                                         scen_name = i,
-                                         final_db_year = final_db_year,
-                                         saveOutput = F) %>%
+    o3_mort_pre <- rfasst::m3_get_mort_o3(prj = prj,
+                                          scen_name = i,
+                                          final_db_year = final_db_year,
+                                          saveOutput = F) %>%
       # select the only one model (GBD)
       dplyr::select(region, year, disease, mort = Jerret2009) %>%
       # Aggregate to region-level
