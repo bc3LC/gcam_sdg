@@ -12,7 +12,7 @@ get_sdg6_water_scarcity <- function(prj) {
   if (!dir.exists("output/SDG6-Water/figures")) dir.create("output/SDG6-Water/figures")
   
   # Get Water Supply Data
-  water_supply = rgcam::getQuery(prj_water, "Basin level available runoff") %>%
+  water_supply = rgcam::getQuery(prj, "Basin level available runoff") %>%
       select(-region) %>%
       bind_rows(
         getQuery(prj_water, "resource supply curves") %>%
@@ -25,7 +25,7 @@ get_sdg6_water_scarcity <- function(prj) {
       rename(value_sup = value) 
   
   # Get Water Withdrawal Data
-  water_withdrawal = rgcam::getQuery(prj_water, "Water Withdrawals by Basin (Runoff)") %>%
+  water_withdrawal = rgcam::getQuery(prj, "Water Withdrawals by Basin (Runoff)") %>%
     select(-region) %>%
     rename(basin = "runoff water") %>%
     bind_rows(
