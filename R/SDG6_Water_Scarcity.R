@@ -14,6 +14,7 @@ get_sdg6_water_scarcity <- function(prj) {
   # Get Water Supply Data
   water_supply = rgcam::getQuery(prj, "Basin level available runoff") %>%
       select(-region) %>%
+      filter(year < 2055) %>% 
       bind_rows(
         getQuery(prj_water, "resource supply curves") %>%
           filter(stringr::str_detect(subresource, "groundwater")) %>%
@@ -28,6 +29,7 @@ get_sdg6_water_scarcity <- function(prj) {
   water_withdrawal = rgcam::getQuery(prj, "Water Withdrawals by Basin (Runoff)") %>%
     select(-region) %>%
     rename(basin = "runoff water") %>%
+    filter(year < 2055) %>% 
     bind_rows(
       getQuery(prj_water, "Water Withdrawals by Basin (Groundwater)") %>%
         filter(stringr::str_detect(subresource, "groundwater")) %>%
@@ -55,7 +57,13 @@ get_sdg6_water_scarcity <- function(prj) {
               index_wd = sum(weighted_wd) / sum(value_wd)) %>%
     ungroup()
 
+    # Filter out groundwater and index weighted by water supply
+  water_scarcity_index_runoff_wd = water_scarcity_index %>% 
+    select(-index_sup) %>% 
+    filter(resource == "runoff")
+  
   write.csv(water_scarcity_index, file = file.path('output/SDG6-Water','water_scarcity_index.csv'), row.names = F)
+  write.csv(water_scarcity_index_runoff_wd, file = file.path('output/SDG6-Water','water_scarcity_index_runoff_wd.csv'), row.names = F)
       
   pl_water_scarcity_index_sup = ggplot(data = water_scarcity_index) + 
     geom_line(aes(x = year, y = index_sup, color = scenario)) +     
