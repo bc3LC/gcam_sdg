@@ -2,8 +2,10 @@ library(dplyr)
 library(tidyr)
 
 #' @param prj uploaded project file
-get_sdg6_water_scarcity <- function(prj) {
-  
+#' @param saveOutput save the produced output
+#' @param makeFigures generate and save graphical representation/s of the output
+get_sdg6_water_scarcity <- function(prj, saveOutput = T, makeFigures = F){
+
   print('computing sdg6 - water scarcity ...')
   
   # Create the directories if they do not exist:
@@ -62,44 +64,46 @@ get_sdg6_water_scarcity <- function(prj) {
     select(-index_sup) %>% 
     filter(resource == "runoff")
   
-  write.csv(water_scarcity_index, file = file.path('output/SDG6-Water','water_scarcity_index.csv'), row.names = F)
-  write.csv(water_scarcity_index_runoff_wd, file = file.path('output/SDG6-Water','water_scarcity_index_runoff_wd.csv'), row.names = F)
+  if (saveOutput) write.csv(water_scarcity_index, file = file.path('output/SDG6-Water','water_scarcity_index.csv'), row.names = F)
+  if (saveOutput) write.csv(water_scarcity_index_runoff_wd, file = file.path('output/SDG6-Water','water_scarcity_index_runoff_wd.csv'), row.names = F)
       
-  pl_water_scarcity_index_sup = ggplot(data = water_scarcity_index) + 
-    geom_line(aes(x = year, y = index_sup, color = scenario)) +     
-    facet_wrap(. ~ resource, scales= "free_y") +
-    labs(y = 'Index', x = 'Year', title = 'Water Scarcity Index (dimensionless) - Supply Weigth') +
-    theme_light() +
-    theme(legend.key.size = unit(2, "cm"), legend.position = 'bottom', legend.direction = 'horizontal',
-          strip.background = element_blank(),
-          strip.text = element_text(color = 'black', size = 40),
-          strip.text.y = element_text(angle = 0),
-          axis.text.x = element_text(size=30),
-          axis.text.y = element_text(size=30),
-          legend.text = element_text(size = 35),
-          legend.title = element_text(size = 40),
-          title = element_text(size = 40))
-  # print(pl_water_scarcity_index_sup)
-  ggsave(pl_water_scarcity_index_sup, file = file.path('output/SDG6-Water/figures', paste0('sdg6_water_scarcity_index_sup.png')),
-         width = 1000, height = 1000, units = 'mm', limitsize = FALSE)
+  if (makeFigures) {
+    pl_water_scarcity_index_sup = ggplot(data = water_scarcity_index) + 
+      geom_line(aes(x = year, y = index_sup, color = scenario)) +     
+      facet_wrap(. ~ resource, scales= "free_y") +
+      labs(y = 'Index', x = 'Year', title = 'Water Scarcity Index (dimensionless) - Supply Weigth') +
+      theme_light() +
+      theme(legend.key.size = unit(2, "cm"), legend.position = 'bottom', legend.direction = 'horizontal',
+            strip.background = element_blank(),
+            strip.text = element_text(color = 'black', size = 40),
+            strip.text.y = element_text(angle = 0),
+            axis.text.x = element_text(size=30),
+            axis.text.y = element_text(size=30),
+            legend.text = element_text(size = 35),
+            legend.title = element_text(size = 40),
+            title = element_text(size = 40))
+    # print(pl_water_scarcity_index_sup)
+    ggsave(pl_water_scarcity_index_sup, file = file.path('output/SDG6-Water/figures', paste0('sdg6_water_scarcity_index_sup.png')),
+           width = 1000, height = 1000, units = 'mm', limitsize = FALSE)
   
-  pl_water_scarcity_index_wd = ggplot(data = water_scarcity_index) + 
-    geom_line(aes(x = year, y = index_wd, color = scenario)) +     
-    facet_wrap(. ~ resource, scales= "free_y") +
-    labs(y = 'Index', x = 'Year', title = 'Water Scarcity Index (dimensionless) - Withdrawal Weight') +
-    theme_light() +
-    theme(legend.key.size = unit(2, "cm"), legend.position = 'bottom', legend.direction = 'horizontal',
-          strip.background = element_blank(),
-          strip.text = element_text(color = 'black', size = 40),
-          strip.text.y = element_text(angle = 0),
-          axis.text.x = element_text(size=30),
-          axis.text.y = element_text(size=30),
-          legend.text = element_text(size = 35),
-          legend.title = element_text(size = 40),
-          title = element_text(size = 40))
-  # print(pl_water_scarcity_index_wd)
-  ggsave(pl_water_scarcity_index_wd, file = file.path('output/SDG6-Water/figures', paste0('sdg6_water_scarcity_index_wd.png')),
-         width = 1000, height = 1000, units = 'mm', limitsize = FALSE)  
+    pl_water_scarcity_index_wd = ggplot(data = water_scarcity_index) + 
+      geom_line(aes(x = year, y = index_wd, color = scenario)) +     
+      facet_wrap(. ~ resource, scales= "free_y") +
+      labs(y = 'Index', x = 'Year', title = 'Water Scarcity Index (dimensionless) - Withdrawal Weight') +
+      theme_light() +
+      theme(legend.key.size = unit(2, "cm"), legend.position = 'bottom', legend.direction = 'horizontal',
+            strip.background = element_blank(),
+            strip.text = element_text(color = 'black', size = 40),
+            strip.text.y = element_text(angle = 0),
+            axis.text.x = element_text(size=30),
+            axis.text.y = element_text(size=30),
+            legend.text = element_text(size = 35),
+            legend.title = element_text(size = 40),
+            title = element_text(size = 40))
+    # print(pl_water_scarcity_index_wd)
+    ggsave(pl_water_scarcity_index_wd, file = file.path('output/SDG6-Water/figures', paste0('sdg6_water_scarcity_index_wd.png')),
+           width = 1000, height = 1000, units = 'mm', limitsize = FALSE)  
+  }
   
   return(water_scarcity_index)
   

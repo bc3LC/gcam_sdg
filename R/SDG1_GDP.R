@@ -2,8 +2,10 @@ library(dplyr)
 library(tidyr)
 
 #' @param prj uploaded project file
-get_sdg1_gdp <- function(prj){
-  
+#' @param saveOutput save the produced output
+#' @param makeFigures generate and save graphical representation/s of the output
+get_sdg1_gdp <- function(prj, saveOutput = T, makeFigures = F){
+
   print('computing sdg1 - food basket bill...')
   
   # Create the directories if they do not exist:
@@ -14,7 +16,7 @@ get_sdg1_gdp <- function(prj){
   # Perform computations
   gdppc <- rgcam::getQuery(prj, "GDP per capita PPP by region")
   
-  write.csv(gdppc, file = file.path('output/SDG1-GDP','gdppc.csv'), row.names = F)
+  if (saveOutput) write.csv(gdppc, file = file.path('output/SDG1-GDP','gdppc.csv'), row.names = F)
   
   return(gdppc)
 } 

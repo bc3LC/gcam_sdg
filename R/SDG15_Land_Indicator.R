@@ -2,8 +2,10 @@ library(dplyr)
 library(tidyr)
 
 #' @param prj uploaded project file
-get_sdg15_land_indicator <- function(prj) {
-  
+#' @param saveOutput save the produced output
+#' @param makeFigures generate and save graphical representation/s of the output
+get_sdg15_land_indicator <- function(prj, saveOutput = T, makeFigures = F){
+
   print('computing sdg15 - land indicator ...')
   
   # Create the directories if they do not exist:
@@ -33,46 +35,49 @@ get_sdg15_land_indicator <- function(prj) {
     ungroup()
 
   # Write CSV
-  write.csv(land_indicator, file = file.path('output/SDG15-Land','land_indicator_regional.csv'), row.names = F)
-  write.csv(land_indicator_global, file = file.path('output/SDG15-Land','land_indicator_global.csv'), row.names = F)
+  if (saveOutput) write.csv(land_indicator, file = file.path('output/SDG15-Land','land_indicator_regional.csv'), row.names = F)
+  if (saveOutput) write.csv(land_indicator_global, file = file.path('output/SDG15-Land','land_indicator_global.csv'), row.names = F)
       
-  # Regional plot (facet)
-  pl_land_regional = ggplot(data = land_indicator) + 
-    geom_line(aes(x = year, y = percent_unmanaged, color = scenario)) +     
-    facet_wrap(. ~ region, scales= "free_y") +
-    labs(y = 'Percent (%)', x = 'Year', title = 'Percentage of Unmanaged Land per GCAM Region') +
-    theme_light() +
-    theme(legend.key.size = unit(2, "cm"), legend.position = 'bottom', legend.direction = 'horizontal',
-          strip.background = element_blank(),
-          strip.text = element_text(color = 'black', size = 40),
-          strip.text.y = element_text(angle = 0),
-          axis.text.x = element_text(size=30),
-          axis.text.y = element_text(size=30),
-          legend.text = element_text(size = 35),
-          legend.title = element_text(size = 40),
-          title = element_text(size = 40))
-  print(pl_land_regional)
-  ggsave(pl_land_regional, file = file.path('output/SDG15-Land/figures', paste0('sdg15-land_indicator_regional.png')),
-         width = 1000, height = 1000, units = 'mm', limitsize = FALSE)
+  if (makeFigures) {
+    # Regional plot (facet)
+    pl_land_regional = ggplot(data = land_indicator) + 
+      geom_line(aes(x = year, y = percent_unmanaged, color = scenario)) +     
+      facet_wrap(. ~ region, scales= "free_y") +
+      labs(y = 'Percent (%)', x = 'Year', title = 'Percentage of Unmanaged Land per GCAM Region') +
+      theme_light() +
+      theme(legend.key.size = unit(2, "cm"), legend.position = 'bottom', legend.direction = 'horizontal',
+            strip.background = element_blank(),
+            strip.text = element_text(color = 'black', size = 40),
+            strip.text.y = element_text(angle = 0),
+            axis.text.x = element_text(size=30),
+            axis.text.y = element_text(size=30),
+            legend.text = element_text(size = 35),
+            legend.title = element_text(size = 40),
+            title = element_text(size = 40))
+    print(pl_land_regional)
+    ggsave(pl_land_regional, file = file.path('output/SDG15-Land/figures', paste0('sdg15-land_indicator_regional.png')),
+           width = 1000, height = 1000, units = 'mm', limitsize = FALSE)
+    
+    # Global plot
+    pl_land_global = ggplot(data = land_indicator_global) + 
+      geom_line(aes(x = year, y = percent_unmanaged, color = scenario)) +     
+      # facet_wrap(. ~ region, scales= "free_y") +
+      labs(y = 'Percent (%)', x = 'Year', title = 'Percentage of Unmanaged Land') +
+      theme_light() +
+      theme(legend.key.size = unit(2, "cm"), legend.position = 'bottom', legend.direction = 'horizontal',
+            strip.background = element_blank(),
+            strip.text = element_text(color = 'black', size = 40),
+            strip.text.y = element_text(angle = 0),
+            axis.text.x = element_text(size=30),
+            axis.text.y = element_text(size=30),
+            legend.text = element_text(size = 35),
+            legend.title = element_text(size = 40),
+            title = element_text(size = 40))
+    print(pl_land_global)
+    ggsave(pl_land_global, file = file.path('output/SDG15-Land/figures', paste0('sdg15-land_indicator_global.png')),
+           width = 1000, height = 1000, units = 'mm', limitsize = FALSE)
+  }
   
-  # Global plot
-  pl_land_global = ggplot(data = land_indicator_global) + 
-    geom_line(aes(x = year, y = percent_unmanaged, color = scenario)) +     
-    # facet_wrap(. ~ region, scales= "free_y") +
-    labs(y = 'Percent (%)', x = 'Year', title = 'Percentage of Unmanaged Land') +
-    theme_light() +
-    theme(legend.key.size = unit(2, "cm"), legend.position = 'bottom', legend.direction = 'horizontal',
-          strip.background = element_blank(),
-          strip.text = element_text(color = 'black', size = 40),
-          strip.text.y = element_text(angle = 0),
-          axis.text.x = element_text(size=30),
-          axis.text.y = element_text(size=30),
-          legend.text = element_text(size = 35),
-          legend.title = element_text(size = 40),
-          title = element_text(size = 40))
-  print(pl_land_global)
-  ggsave(pl_land_global, file = file.path('output/SDG15-Land/figures', paste0('sdg15-land_indicator_global.png')),
-         width = 1000, height = 1000, units = 'mm', limitsize = FALSE)
   
   return(land_indicator)
   
