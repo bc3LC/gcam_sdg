@@ -43,7 +43,7 @@ get_sdg2_food_basket_bill <- function(prj, saveOutput = T, makeFigures = F){
                        dplyr::group_by(Units, region, scenario, input, year) %>%
                        dplyr::summarise(value = sum(value)) %>%
                        dplyr::ungroup() %>%
-                       dplyr::mutate(price = value * 1e3,
+                       dplyr::mutate(price = value / 1e3, # Mcal to kcal
                                      units_price = '2005$/kcal/day') %>%
                        dplyr::select(-c(Units,value)) %>%
                        dplyr::rename('supplysector' = 'input'),
@@ -69,9 +69,29 @@ get_sdg2_food_basket_bill <- function(prj, saveOutput = T, makeFigures = F){
     mutate(expenditure_percent_GDP = expenditure / GDP * 100) %>% 
     select(region, year, scenario, expenditure_percent_GDP) %>% 
     mutate(units = 'percentage')
-
   
   if (saveOutput) write.csv(food_basket_bill_percent_GDP, file = file.path('output/SDG2-Poverty','food_basket_bill_percent_GDP.csv'), row.names = F)
   
-  return(food_basket_bill_percent_GDP)
+  # compute GLOBAL food basket expenditure
+  # consider the regional food basket bill with respect the GDP and weight it by the regional population
+  pop_weights <- getQuery(prj, "population by region") %>%
+    dplyr::select(-Units) %>%
+    dplyr::rename(population = value) %>% 
+    dplyr::group_by(year, scenario) %>% 
+    dplyr::mutate(total_population = sum(population)) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(w_pop = population / total_population) %>% 
+    dplyr::select(region, year, scenario, w_pop)
+  
+  food_basket_bill_percent_GDP_global <- food_basket_bill_percent_GDP %>% 
+    left_join(pop_weights, by = c('region', 'year', 'scenario')) %>% 
+    mutate(weighted_expenditure_percent_GDP = expenditure_percent_GDP * w_pop) %>% 
+    group_by(year, scenario, units) %>% 
+    summarise(expenditure_percent_GDP = sum(weighted_expenditure_percent_GDP)) %>% 
+    ungroup()
+    
+  if (saveOutput) write.csv(food_basket_bill_percent_GDP_global, file = file.path('output/SDG2-Poverty','food_basket_bill_percent_GDP_global.csv'), row.names = F)
+  
+  return(food_basket_bill_percent_GDP_global)
 } 
