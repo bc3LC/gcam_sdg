@@ -19,7 +19,7 @@ get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year 
   
   scen_name <- rgcam::listScenarios(prj)
   
-  mort.list <- NULL
+  mort.list <- list()
   
   for(i in scen_name) {
     
@@ -27,7 +27,8 @@ get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year 
                                          scen_name = i,
                                          final_db_year = final_db_year,
                                          saveOutput = saveOutput,
-                                         map = makeFigures) %>%
+                                         map = makeFigures,
+                                         recompute = T) %>%
       # select the only one model (GBD)
       dplyr::select(region, year, age, disease, mort = GBD) %>%
       # Aggregate to region-level
@@ -93,7 +94,8 @@ get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year 
                                           scen_name = i,
                                           final_db_year = final_db_year,
                                           saveOutput = saveOutput,
-                                          map = makeFigures) %>%
+                                          map = makeFigures,
+                                          recompute = T) %>%
       # select the only one model (GBD)
       dplyr::select(region, year, disease, mort = Jerret2009) %>%
       # Aggregate to region-level
@@ -137,6 +139,9 @@ get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year 
       dplyr::summarise(mort = sum(mort)) %>%
       dplyr::ungroup()
     
+    #--------------------
+    # Append to list
+    mort.list <- append(mort.list, mort)
   }
   
   mort_fin <- dplyr::bind_rows(mort.list)
