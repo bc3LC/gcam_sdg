@@ -155,7 +155,7 @@ get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year 
   save(mort.list, file = file.path('output/SDG3-Health/mort.list',paste0('mort_list_',gsub("\\.dat$", "", prj_name),'.RData')))
   
   mort_fin <- dplyr::bind_rows(mort.list)
-  if (saveOutput) write.csv(mort_fin, file = file.path('output/SDG3-Health/mort.fin',paste0('mort_fin_',gsub("\\.dat$", "", prj_name))), row.names = F)
+  if (saveOutput) write.csv(mort_fin, file = file.path('output/SDG3-Health/mort.fin',paste0('mort_fin_',gsub("\\.dat$", "", prj_name, ".csv"))), row.names = F)
   
   return(invisible(mort))
   
