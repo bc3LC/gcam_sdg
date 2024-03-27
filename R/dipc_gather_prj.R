@@ -6,7 +6,7 @@ libP <- .libPaths()
 .libPaths(c(libP,"/scratch/bc3LC/R-libs/4.1"))
 
 ## List all prj files
-sub_prj_names <- c(list.files('/scratch/bc3LC/gcam_bio_accounting/output/', pattern = '*.dat'))
+sub_prj_names <- c(list.files('/scratch/bc3LC/gcam_bio_accounting/output', pattern = '*.dat'))
 for (it in sub_prj_names) {
   print(it)
   assign(gsub("\\.dat$", "", it),
@@ -16,5 +16,5 @@ for (it in sub_prj_names) {
 }
 
 ## Gather and save
-prj_gathered <- rgcam::mergeProjects(prjname = 'gath_all.dat', prjlist = sub_prj_names, saveProj = T)
+prj_gathered <- rgcam::mergeProjects(prjname = 'gath_all_base.dat', prjlist = sub_prj_names, saveProj = T)
 print(rgcam::listQueries(prj_gathered, anyscen = F))
