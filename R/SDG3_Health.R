@@ -139,7 +139,9 @@ get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year 
       dplyr::summarise(mort = sum(mort)) %>%
       dplyr::ungroup() %>%
       mutate(scenario = i)
-    
+
+    #--------------------
+    # Append to list
     mort.list <- append(mort.list, mort)
   }
   
