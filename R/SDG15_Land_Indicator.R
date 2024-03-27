@@ -14,10 +14,12 @@ get_sdg15_land_indicator <- function(prj, saveOutput = T, makeFigures = F){
   if (!dir.exists("output/SDG15-Land/figures")) dir.create("output/SDG15-Land/figures")
   
   # Compute the Land Indicator (Percent of Unmanaged Land)
-  land_indicator = rgcam::getQuery(prj_land, "detailed land allocation") %>% 
+  land_indicator_pre = rgcam::getQuery(prj, "detailed land allocation") 
+  
+  land_indicator = rgcam::getQuery(prj, "detailed land allocation") %>% 
     mutate(value = value * 0.1) %>% # Convert to Mha
     mutate(management = case_when(
-      grepl("ProtectedUnmanagedForest|UnmanagedForest|Shrubland|ProtectedShrubland|Grassland|ProtectedGrassland|UnmanagedPasture|ProtectedUnmanagedPasture|Tundra|RockIceDesert", land_indicator$landleaf) ~ "Unmanaged",
+      grepl("ProtectedUnmanagedForest|UnmanagedForest|Shrubland|ProtectedShrubland|Grassland|ProtectedGrassland|UnmanagedPasture|ProtectedUnmanagedPasture|Tundra|RockIceDesert", land_indicator_pre$landleaf) ~ "Unmanaged",
       TRUE ~ "Managed")) %>% 
     group_by(scenario, region, year, management) %>% 
     summarize(value = sum(value)) %>% 
@@ -79,7 +81,7 @@ get_sdg15_land_indicator <- function(prj, saveOutput = T, makeFigures = F){
   }
   
   
-  return(land_indicator)
+  return(land_indicator_global)
   
 }  
   

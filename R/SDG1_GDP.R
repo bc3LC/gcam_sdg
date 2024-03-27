@@ -6,7 +6,7 @@ library(tidyr)
 #' @param makeFigures generate and save graphical representation/s of the output
 get_sdg1_gdp <- function(prj, saveOutput = T, makeFigures = F){
 
-  print('computing sdg1 - food basket bill...')
+  print('computing sdg1 - GDP...')
   
   # Create the directories if they do not exist:
   if (!dir.exists("output")) dir.create("output")

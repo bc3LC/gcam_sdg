@@ -18,7 +18,7 @@ get_sdg6_water_scarcity <- function(prj, saveOutput = T, makeFigures = F){
       select(-region) %>%
       filter(year < 2055) %>% 
       bind_rows(
-        getQuery(prj_water, "resource supply curves") %>%
+        getQuery(prj, "resource supply curves") %>%
           filter(stringr::str_detect(subresource, "groundwater")) %>%
           mutate(subresource = "groundwater") %>%
           group_by(scenario, year, resource, subresource, Units) %>%
@@ -33,7 +33,7 @@ get_sdg6_water_scarcity <- function(prj, saveOutput = T, makeFigures = F){
     rename(basin = "runoff water") %>%
     filter(year < 2055) %>% 
     bind_rows(
-      getQuery(prj_water, "Water Withdrawals by Basin (Groundwater)") %>%
+      getQuery(prj, "Water Withdrawals by Basin (Groundwater)") %>%
         filter(stringr::str_detect(subresource, "groundwater")) %>%
         mutate(subresource = "groundwater") %>%
         group_by(scenario, year, groundwater, subresource, Units) %>%
