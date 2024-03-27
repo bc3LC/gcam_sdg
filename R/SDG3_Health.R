@@ -137,7 +137,8 @@ get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year 
     ) %>%
       dplyr::group_by(GCAM_region, year) %>%
       dplyr::summarise(mort = sum(mort)) %>%
-      dplyr::ungroup()
+      dplyr::ungroup() %>%
+      mutate(scenario = i)
     
     mort.list <- append(mort.list, mort)
   }
