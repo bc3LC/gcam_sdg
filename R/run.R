@@ -5,16 +5,18 @@ library(gcamdata)
 library(rfasst)
 
 run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
-  
+
   prj <- rgcam::loadProject("gath_all_base.dat")
   final_db_year <- 2050
   saveOutput <- T
-  
+
   baseline_scen <- "SDGstudy_incr_base"
   first_model_year <- 2020
-  
+
   # SDG 1: GDP
-  gdp_pre <- get_sdg1_gdp(prj, saveOutput = F) %>%
+  gdp_output <- get_sdg1_gdp(prj, saveOutput = F)
+
+  gdp_pre <- gdp_output %>%
     mutate(Units = "Thous$/pers") %>%
     left_join_error_no_match(getQuery(prj,"population by region"), by = join_by(scenario, region, year)) %>%
     mutate(pop = value.y * 1E3,
@@ -26,8 +28,8 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
     mutate(GDPpc_thous = gdp / pop / 1E3) %>%
     select(scenario, year, GDPpc_thous) %>%
     mutate(unit = "Thous$/pers")
-  
-  gdp_base <- get_sdg1_gdp(prj, saveOutput = F) %>%
+
+  gdp_base <- gdp_output %>%
     mutate(Units = "Thous$/pers") %>%
     left_join_error_no_match(getQuery(prj,"population by region"), by = join_by(scenario, region, year)) %>%
     mutate(pop = value.y * 1E3,
@@ -42,7 +44,7 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
     filter(scenario == baseline_scen) %>%
     rename(GDPpc_thous_base = GDPpc_thous) %>%
     select(-scenario)
-  
+
   gdp <- gdp_pre %>%
     left_join_error_no_match(gdp_base, by = join_by(year, unit)) %>%
     filter(year <= final_db_year,
@@ -65,10 +67,12 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
     pivot_wider(names_from = sector,
                 values_from = diff) %>%
     arrange(as.numeric(Gt_CO2_reduction))
-  
+
   # SDG 2: GDP
-  poverty <- get_sdg2_food_basket_bill(prj, saveOutput = F) %>%
-    left_join_error_no_match(get_sdg2_food_basket_bill(prj, saveOutput = F) %>%
+  poverty_output <- get_sdg2_food_basket_bill(prj, saveOutput = F)
+
+  poverty <- poverty_output %>%
+    left_join_error_no_match(poverty_output %>%
                                filter(scenario == baseline_scen) %>%
                                rename(expenditure_percent_GDP_base = expenditure_percent_GDP) %>%
                                select(-scenario), by = join_by(year, units)) %>%
@@ -96,21 +100,21 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
 
   # SDG 3: Health
   # health <- get_sdg3_health(prj, final_db_year = 2050)
-  
+
   # reading it exogenously for the number of scenarios
-  health_pre <- read.csv("mort.fin_ALL.csv") %>%
+  health_pre <- read.csv("C:/GCAM_working_group/IAM COMPACT/gcam_bio_accounting/output/SDG3-Health/mort.fin/mort.fin_ALL.csv") %>%
     group_by(scenario, year) %>%
     summarise(mort = sum(mort)) %>%
     ungroup()
-    
-  health_base <- read.csv("mort.fin_ALL.csv") %>%
+
+  health_base <- read.csv("C:/GCAM_working_group/IAM COMPACT/gcam_bio_accounting/output/SDG3-Health/mort.fin/mort.fin_ALL.csv") %>%
     group_by(scenario, year) %>%
     summarise(mort = sum(mort)) %>%
     ungroup() %>%
     filter(scenario == baseline_scen) %>%
     rename(mort_base = mort) %>%
     select(-scenario)
-  
+
   health <- health_pre %>%
     left_join_error_no_match(health_base, by = "year") %>%
     filter(year <= final_db_year,
@@ -134,15 +138,17 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
     pivot_wider(names_from = sector,
                 values_from = diff) %>%
     arrange(as.numeric(Gt_CO2_reduction))
-  
+
   # SDG 6
-  water <- get_sdg6_water_scarcity(prj,saveOutput = F) %>%
+  water_output <- get_sdg6_water_scarcity(prj,saveOutput = F)
+
+  water <- water_output %>%
     filter(resource == "runoff") %>%
     select(scenario, year, index = index_wd) %>%
-    left_join_error_no_match(get_sdg6_water_scarcity(prj,saveOutput = F) %>%
+    left_join_error_no_match(water_output %>%
                                filter(resource == "runoff",
                                       scenario == baseline_scen) %>%
-                               select(year, index_base = index_wd), by = join_by(year)) %>% 
+                               select(year, index_base = index_wd), by = join_by(year)) %>%
     mutate(Units = "Index") %>%
     filter(year <= final_db_year,
            year >= first_model_year) %>%
@@ -164,14 +170,16 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
     pivot_wider(names_from = sector,
                 values_from = diff) %>%
     arrange(as.numeric(Gt_CO2_reduction))
-  
+
   # SDG 15: Land
-  
+
   # Test new proj file with detailed land allocation in all scens
-  land <- get_sdg15_land_indicator(prj, saveOutput = F) %>%
+  land_output <- get_sdg15_land_indicator(prj, saveOutput = F)
+
+  land <- land_output %>%
     filter(year <= final_db_year,
            year >= first_model_year) %>%
-    left_join_error_no_match(get_sdg15_land_indicator(prj,saveOutput = F) %>%
+    left_join_error_no_match(land_output %>%
                                filter(scenario == baseline_scen) %>%
                                select(year, percent_unmanaged_base = percent_unmanaged) %>%
                                filter(year <= final_db_year,
@@ -195,9 +203,9 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
     pivot_wider(names_from = sector,
                 values_from = diff) %>%
     arrange(as.numeric(Gt_CO2_reduction))
-  
-  
-  
+
+
+
   sdg <- bind_rows(
     gdp,
     poverty,
@@ -205,7 +213,7 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
     water,
     land
   )
-  
-   write.csv(sdg, "sdg_Deliverable.csv", row.names = F)
-  
-} 
+
+   write.csv(sdg, file = file.path("output","sdg_Deliverable.csv"), row.names = F)
+
+}
