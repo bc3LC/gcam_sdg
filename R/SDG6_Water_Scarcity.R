@@ -42,22 +42,31 @@ get_sdg6_water_scarcity <- function(prj, saveOutput = T, makeFigures = F){
         rename(basin = groundwater)) %>%
     rename(value_wd = value)
 
+  # Extract values of baseline 
+  water_withdrawal_2015 = water_withdrawal %>% filter(year == 2015) %>% rename(value_wd_2015 = value_wd)
+  water_supply_2015 = water_supply %>% filter(year == 2015) %>% rename(value_sup_2015 = value_sup)
+  
   # Compute the Weighted Water Scarcity Index (Weighted per Basin both by Supply & by Withdrawal)
   water_scarcity_index = water_supply %>%
     left_join(water_withdrawal) %>%
-    mutate(index = value_wd / value_sup) %>%
-    group_by(scenario, basin, subresource, year) %>%
-    summarize(value_sup = mean(value_sup),
-              value_wd = mean(value_wd),
-              index = mean(index)) %>%
-    ungroup() %>%
+    mutate(index = value_wd / value_sup) 
+  water_scarcity_index = merge(water_scarcity_index, water_withdrawal_2015, by = c("basin", "scenario", "subresource"))
+  water_scarcity_index = merge(water_scarcity_index, water_supply_2015, by = c("basin", "scenario", "subresource"))
+  water_scarcity_index = water_scarcity_index %>% 
+    # group_by(scenario, basin, subresource, year) %>% 
+    # summarize(value_sup = mean(value_sup),
+    #           value_wd = mean(value_wd),
+    #           index = mean(index)) %>% 
+    # ungroup() %>% 
   # %>% filter(!index > 1)
-    mutate(weighted_sup = index * value_sup,
-           weighted_wd = index * value_wd) %>%
+    mutate(weighted_sup = index * value_sup_2015,
+           weighted_wd = index * value_wd_2015) %>%
+    select(-year, -year.y) %>% 
+    rename(year = year.x) %>% 
     group_by(scenario, year, resource = if_else(subresource == "runoff", "runoff", "groundwater")) %>%
-    summarize(index_sup = sum(weighted_sup) / sum(value_sup),
-              index_wd = sum(weighted_wd) / sum(value_wd)) %>%
-    ungroup()
+    summarize(index_sup = sum(weighted_sup) / sum(value_sup_2015),
+              index_wd = sum(weighted_wd) / sum(value_wd_2015)) %>%
+    ungroup() 
 
     # Filter out groundwater and index weighted by water supply
   water_scarcity_index_runoff_wd = water_scarcity_index %>%
