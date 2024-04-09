@@ -6,7 +6,14 @@ library(rfasst)
 
 run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
 
-  prj <- rgcam::loadProject("gath_all_base.dat")
+  # load SDG reporting scripts
+  source('R/SDG1_GDP.R')
+  source('R/SDG2_Food_Basket_Bill.R')
+  source('R/SDG3_Health.R')
+  source('R/SDG6_Water_Scarcity.R')
+  source('R/SDG15_Land_Indicator.R')
+  
+  prj <- rgcam::loadProject("C:/GCAM_working_group/IAM COMPACT/gcam_bio_accounting/output/prj_files/gath_all_base.dat")
   final_db_year <- 2050
   saveOutput <- T
 
@@ -171,8 +178,8 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
                 values_from = diff) %>%
     arrange(as.numeric(Gt_CO2_reduction))
 
+  
   # SDG 15: Land
-
   # Test new proj file with detailed land allocation in all scens
   land_output <- get_sdg15_land_indicator(prj, saveOutput = F)
 
