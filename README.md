@@ -8,16 +8,20 @@ TBA
 
 ### SDG 2: Zero hunger
 Source: https://www.un.org/sustainabledevelopment/hunger/
+
 Script: [SDG2_Food_Basket_Bill.R](https://github.com/bc3LC/gcam_sdg/blob/main/R/SDG2_Food_Basket_Bill.R)
-Description: 
+
+#### Description: 
 In this implementation, SDG 2 is represented as the (avoided) per capita food basket bill. The calculations estimate the annual regional expenditure by a median consumer. Specifically, for each period t and region r, all food items are aggregated into *Staples* and *Non-Staples*. Then, the total consumption of each group has been multiplied by its price, as described in the equation below:
 
 $$FoodExpenditurePC_{t,r} = \sum_{fs\ in\ foodStapleItems} ConsumptionPC_{fs,t,r} \cdot PricePCStaples_{t,r} + \\ \sum_{fc\ in\ foodNonStapleItems} ConsumptionPC_{fn,t,r} \cdot PricePCNonStaples_{t,r}$$
 
 ### SDG 3: Ensure healthy lives and promote well-being for all at all ages
 Source: https://www.un.org/sustainabledevelopment/health/
+
 Script: [SDG3_Health.R](https://github.com/bc3LC/gcam_sdg/blob/main/R/SDG3_Health.R)
-Description: 
+
+#### Description: 
 In this implementation, SDG 3 is represented as the (avoided) premature mortalities attributable to long-term exposure to both fine particulate matter (PM2.5) and tropospheric ozone (O3). Calculations have been computed using rfasst, a tool designed to quantify adverse health and agricultural effects attributable to air pollution for alternative scenarios (Sampedro et al 2022). The tool mimics the well-stablished TM5-FASST model (Van Dingenen et al 2018). 
 The calculation of premature mortalities is based on the population-attributable fraction approach, so premature mortality (Mort) for cause c, in period t, region r, associated with exposure to pollutant j, is calculated as the product between the baseline mortality rate, the change in the RR relative risk of death attributable to a change in population-weighted mean pollutant concentration, and the population exposed. This is described in the following equation:
 
@@ -32,7 +36,7 @@ Mortalities are estimated for six causes, namely stroke, ischemic heart disease 
 
 - For O3, relative risk is based on the ERFs from Jerrett et al 2009. 
 
-References SDG3
+#### References SDG3
 
 -Burnett R T, Pope C A III, Ezzati M, Olives C, Lim S S, Mehta S, Shin H H, Singh G, Hubbell B, Brauer M, Anderson H R, Smith K R, Balmes J R, Bruce N G, Kan H, Laden F, Prüss-Ustün A, Turner M C, Gapstur S M, Diver W R and Cohen A 2014 An Integrated Risk Function for Estimating the Global Burden of Disease Attributable to Ambient Fine Particulate Matter Exposure Environmental Health Perspectives Online: http://ehp.niehs.nih.gov/1307049/
 
