@@ -52,7 +52,49 @@ References SDG3
 
 - Van Dingenen R, Dentener F, Crippa M, Leitao J, Marmer E, Rao S, Solazzo E and Valentini L 2018 TM5-FASST: a global atmospheric source–receptor model for rapid impact analysis of emission changes on air quality and short-lived climate pollutants Atmospheric Chemistry and Physics 18 16173–211
 
+## SDG 6: Clean Water and Sanitation
+Source: https://www.un.org/sustainabledevelopment/water-and-sanitation/
 
+Script: [SDG6_Water_Scarcity.R](https://github.com/bc3LC/gcam_sdg/blob/main/R/SDG6_Water_Scarcity.R)
+
+Description: 
+
+The water module of GCAM is structured in 235 basins. The water withdrawals are defined as water diverted from a surface water or groundwater source. They are estimated for six major sectors: agriculture, electricity generation, industrial manufacturing, primary energy production, livestock and municipal uses. 
+
+The water supply separates three distinct sources of fresh water: renewable water, non-renewable groundwater and desalinated water. Renewable water is water that is replenished naturally by surface runoff and subsurface infiltration and release. It is determined by the natural streamflow, baseflow, the total reservoir storage and the environmental flow requirement for each basins (Kim et al., 2016). 
+
+We quantify physical water scarcity as the ratio of water withdrawals to renewable water supply for each basin (Birnbaum et al., 2022). The fraction of water demand relative to available renewable surface water supply has also been labelled ‘water stress index’ in previous studies (Byers et al., 2018). To derive a single estimate per scenario, we compute the average of the index weighted by the volume of renewable water withdrawal of each basin at baseline year (2015). The index is estimated with the following equations: 
+
+$$I_{s,b}=W_{s,b}/S_{s,b}$$ 
+
+and
+
+$$I_{s} = sum_{b=1}^b (I_{s,b} * W_{s,b,2015}) / sum_{b=1}^b W_{s,b,2015}$$
+
+Where I is the water scarcity index per basin (dimensionless), W is the water withdrawal in km3, S is the renewable water supply in km3, b are the basins, and s are the scenarios. 
+
+References SDG6
+
+- Birnbaum, A., Lamontagne, J., Wild, T., Dolan, F., & Yarlagadda, B. (2022). Drivers of Future Physical Water Scarcity and Its Economic Impacts in Latin America and the Caribbean. Earth’s Future, 10(8), e2022EF002764. https://doi.org/10.1029/2022EF002764
+- Byers, E., Gidden, M., Leclère, D., Balkovic, J., Burek, P., Ebi, K., Greve, P., Grey, D., Havlik, P., Hillers, A., Johnson, N., Kahil, T., Krey, V., Langan, S., Nakicenovic, N., Novak, R., Obersteiner, M., Pachauri, S., Palazzo, A., … Riahi, K. (2018). Global exposure and vulnerability to multi-sector development and climate change hotspots. Environmental Research Letters, 13(5), 055012. https://doi.org/10.1088/1748-9326/aabf45
+- Kim, S. H., Hejazi, M., Liu, L., Calvin, K., Clarke, L., Edmonds, J., Kyle, P., Patel, P., Wise, M., & Davies, E. (2016). Balancing global water availability and use at basin scale in an integrated assessment model. Climatic Change, 136(2), 217–231. https://doi.org/10.1007/s10584-016-1604-6
+
+## SDG15: Life of Land
+Source: https://www.un.org/sustainabledevelopment/biodiversity/
+
+Description: 
+
+The land module is structured around 384 distinct land-water regions, called LUTs, and provides outputs on land allocation for 43 land uses per LUT. It computes supply, demand, and land utilisation in various sectors, encompassing food, feed, fiber, forestry, and bioenergy production. The land uses can be categorized into two broad sets: managed and unmanaged land. The latter includes unmanaged forests, unmanaged pasture, shrubland, grassland, tundra and other land types (e.g. rock, ice and desert). 
+
+The indicator reported for SDG15 is the proportion of unmanaged land on total land area, which is assumed to represent the impact of anthropic activities, such as deforestation and land degradation, on the biological integrity of the global land system. The average value per scenario is computed by weighting values of LUTs by their total respective areas,  through the following equations: 
+
+$$P_{s,b}=100*UL_{s,b}/TL_{s,b}$$ 
+
+and
+
+$$P_{s} = sum_{i=1}^i (P_{s,i} * TL_{s,i}) / sum_{i=1}^i TL_{s,i}$$
+
+Where P is the unmanaged land proportion in %, UL is the area of unmanaged land in Mha, TL is the total area (managed and unmanaged) in Mha, i are the LUTs, and s are the scenarios. 
 
 ## GCAM SDG studies
 
