@@ -7,7 +7,7 @@ library(rfasst)
 #' @param prj uploaded project file
 #' @param saveOutput save the produced output
 #' @param makeFigures generate and save graphical representation/s of the output
-get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050, prj_name){
+get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
   
   print('computing sdg3 - health impacts......')
   
@@ -19,34 +19,29 @@ get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year 
   if (!dir.exists("output/SDG3-Health/figures")) dir.create("output/SDG3-Health/figures")
   if (!dir.exists("output/SDG3-Health/maps")) dir.create("output/SDG3-Health/maps")
   
-  scen_name <- rgcam::listScenarios(prj)
+  scenarios <- rgcam::listScenarios(prj)
   
-  mort.list <- list()
-  
-  for(i in scen_name) {
-    print(i)
-    
     mort_pre <- rfasst::m3_get_mort_pm25(prj = prj,
-                                         scen_name = i,
+                                         scen_name = scenarios,
                                          final_db_year = final_db_year,
                                          saveOutput = saveOutput,
                                          map = makeFigures,
                                          recompute = T) %>%
       # select the only one model (GBD)
-      dplyr::select(region, year, age, disease, mort = GBD) %>%
+      dplyr::select(scenario, region, year, age, disease, mort = GBD) %>%
       # Aggregate to region-level
-      dplyr::group_by(region, year) %>%
+      dplyr::group_by(scenario, region, year) %>%
       dplyr::summarise(mort = sum(mort)) %>%
       dplyr::ungroup() 
     
-    # Add-uo RUS and RUE
+    # Add-up RUS and RUE
     mort_adj <- mort_pre %>%
       dplyr::filter(region == "RUE") %>%
       dplyr::mutate(region = "RUS") %>%
       dplyr::bind_rows(
         mort_pre %>% dplyr::filter(region != "RUE")
       ) %>%
-      dplyr::group_by(region, year) %>%
+      dplyr::group_by(scenario, region, year) %>%
       dplyr::summarise(mort = sum(mort)) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(year = as.numeric(year))
@@ -80,32 +75,34 @@ get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year 
     
     mort.pm25_country<- dplyr::bind_rows(country_shares, twn_share) %>%
       dplyr::rename(region = fasst_region) %>%
-      dplyr::left_join(mort_adj, by = c('region', 'year')) %>%
-      dplyr::filter(complete.cases(.)) %>%
+      gcamdata::repeat_add_columns(tibble(scenario = scenarios)) %>%
+      filter(year <= final_db_year,
+             year %in% rfasst::all_years) %>%
+      gcamdata::left_join_error_no_match(mort_adj, by = c('scenario','region', 'year')) %>%
       dplyr::mutate(mort = round(mort * share, 0)) %>%
-      dplyr::select(country, year, mort)
+      dplyr::select(scenario, country, year, mort)
     
     mort.pm25 <- mort.pm25_country %>%
       gcamdata::left_join_error_no_match(rfasst::GCAM_reg %>%
                                            dplyr::rename(country = `ISO 3`),
                                          by = 'country') %>%
-      dplyr::select(GCAM_region = `GCAM Region`, year, mort) %>%
-      dplyr::group_by(GCAM_region, year) %>%
+      dplyr::select(scenario, GCAM_region = `GCAM Region`, year, mort) %>%
+      dplyr::group_by(scenario, GCAM_region, year) %>%
       dplyr::summarise(mort = sum(mort)) %>%
       dplyr::ungroup()
       
     #--------------------
       # ADD O3
     o3_mort_pre <- rfasst::m3_get_mort_o3(prj = prj,
-                                          scen_name = i,
+                                          scen_name = scenarios,
                                           final_db_year = final_db_year,
                                           saveOutput = saveOutput,
                                           map = makeFigures,
                                           recompute = T) %>%
       # select the only one model (GBD)
-      dplyr::select(region, year, disease, mort = Jerret2009) %>%
+      dplyr::select(scenario, region, year, disease, mort = Jerret2009) %>%
       # Aggregate to region-level
-      dplyr::group_by(region, year) %>%
+      dplyr::group_by(scenario, region, year) %>%
       dplyr::summarise(mort = sum(mort)) %>%
       dplyr::ungroup() 
     
@@ -116,24 +113,26 @@ get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year 
       dplyr::bind_rows(
         o3_mort_pre %>% dplyr::filter(region != "RUE")
       ) %>%
-      dplyr::group_by(region, year) %>%
+      dplyr::group_by(scenario, region, year) %>%
       dplyr::summarise(mort = sum(mort)) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(year = as.numeric(year))
     
     mort.o3_country<- dplyr::bind_rows(country_shares, twn_share) %>%
       dplyr::rename(region = fasst_region) %>%
-      dplyr::left_join(o3_mort_adj, by = c('region', 'year')) %>%
-      dplyr::filter(complete.cases(.)) %>%
+      gcamdata::repeat_add_columns(tibble(scenario = scenarios)) %>%
+      filter(year <= final_db_year,
+             year %in% rfasst::all_years) %>%
+      gcamdata::left_join_error_no_match(o3_mort_adj, by = c('scenario','region', 'year')) %>%
       dplyr::mutate(mort = round(mort * share, 0)) %>%
-      dplyr::select(country, year, mort)
+      dplyr::select(scenario, country, year, mort)
     
     mort.o3 <- mort.o3_country %>%
       gcamdata::left_join_error_no_match(rfasst::GCAM_reg %>% 
                                            dplyr::rename(country = `ISO 3`),
                                          by = c('country')) %>%
-      dplyr::select(GCAM_region = `GCAM Region`, year, mort) %>%
-      dplyr::group_by(GCAM_region, year) %>%
+      dplyr::select(scenario, GCAM_region = `GCAM Region`, year, mort) %>%
+      dplyr::group_by(scenario, GCAM_region, year) %>%
       dplyr::summarise(mort = sum(mort)) %>%
       dplyr::ungroup()
     
@@ -143,19 +142,15 @@ get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year 
       mort.pm25,
       mort.o3
     ) %>%
-      dplyr::group_by(GCAM_region, year) %>%
+      dplyr::group_by(scenario, GCAM_region, year) %>%
       dplyr::summarise(mort = sum(mort)) %>%
-      dplyr::ungroup() %>%
-      mutate(scenario = i)
+      dplyr::ungroup()
 
     #--------------------
-    # Append to list
-    mort.list[[i]] <- mort
-  }
-  save(mort.list, file = file.path('output/SDG3-Health/mort.list',paste0('mort_list_',gsub("\\.dat$", "", prj_name),'.RData')))
+  #save(mort, file = file.path('output/SDG3-Health/mort',paste0('mort_',gsub("\\.dat$", "", prj),'.RData')))
   
-  mort_fin <- dplyr::bind_rows(mort.list)
-  if (saveOutput) write.csv(mort_fin, file = file.path('output/SDG3-Health/mort.fin',paste0('mort_fin_',gsub("\\.dat$", "", prj_name, ".csv"))), row.names = F)
+  mort_fin <- mort
+  if (saveOutput) write.csv(mort_fin, file = file.path('output/SDG3-Health/mort.fin',paste0('mort_fin_',gsub("\\.dat$", "", prj, ".csv"))), row.names = F)
   
   return(invisible(mort))
   
