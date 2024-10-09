@@ -14,7 +14,7 @@ get_sdg2_food_basket_bill <- function(prj, saveOutput = T, makeFigures = F){
   if (!dir.exists("output/SDG2-Poverty/figures")) dir.create("output/SDG2-Poverty/figures")
 
   # Perform computations
-  food_subsector <- read.csv(file.path('inst','extdata','food_subsector.csv'))
+  food_subsector <- read.csv(file.path('sdg_reporting','inst','extdata','food_subsector.csv'))
 
   food_basket_bill_regional <- rgcam::getQuery(prj, "food consumption by type (specific)") %>%
     dplyr::group_by(Units, region, scenario, subsector...4, subsector...5, technology, year) %>%
