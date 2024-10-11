@@ -10,7 +10,7 @@
 #' @return create the specified project
 create_prj <- function(db_name, desired_scen = NULL, prj_name = NULL) {
   db_path <- file.path(base_path,'output')
-  query_path <- file.path(base_path, 'sdg_reporting', 'inst', 'extdata')
+  query_path <- file.path(base_path, 'gcam_sdg', 'inst', 'extdata')
   
   ##############################################################################
   ##############################################################################
@@ -78,26 +78,25 @@ create_prj <- function(db_name, desired_scen = NULL, prj_name = NULL) {
   ##############################################################################
   # 3. create project
   
-  print('create prj')
   # create/load prj
-  if (!file.exists(file.path('output',prj_name))) {
+  if (!file.exists(file.path('prj_files',prj_name))) {
     print('create prj')
     prj <- rgcam::addScenario(conn, prj_name, desired_scen,
                               file.path(query_path, 'queries_all_sdg.xml'),
                               clobber = FALSE, saveProj = FALSE)
   } else {
     print('load prj')
-    prj <- rgcam::loadProject(file.path('output',prj_name))
+    prj <- rgcam::loadProject(file.path('prj_files',prj_name))
   }
   
   # add detailed land query if necessary
-  if (length(rgcam::listQueries(prj, anyscen = F)) != length(rgcam::listQueries(prj, anyscen = T))) {
+  prj_tmp = NULL
+  if (!'detailed land allocation' %in% rgcam::listQueries(prj, anyscen = F)) {
     print('add detailed land query')
     prj_tmp <- rgcam::addScenario(conn, prj_name, desired_scen,
                                   file.path(query_path, 'queries_detailed_land.xml'),
                                   clobber = FALSE, saveProj = FALSE)
     prj <- rgcam::mergeProjects(prj_name, list(prj, prj_tmp), clobber = FALSE, saveProj = FALSE)
-    rm(prj_tmp)
   }
   
   # add 'nonCO2' large query
@@ -108,9 +107,12 @@ create_prj <- function(db_name, desired_scen = NULL, prj_name = NULL) {
       project = prj_name, qdata = dt_sec, saveProj = FALSE,
       queryname = "nonCO2 emissions by sector (excluding resource production)", clobber = FALSE
     )
-    prj <- rgcam::mergeProjects(prj_name, list(prj, prj_tmp), clobber = FALSE, saveProj = TRUE)
-  } else {
-    saveProject(prj, file = file.path('output',prj_name))
+    prj <- rgcam::mergeProjects(prj_name, list(prj, prj_tmp), clobber = FALSE, saveProj = FALSE)
+  }
+  
+  if (!is.null(prj_tmp)) {
+    print('save prj')
+    saveProject(prj, file = file.path('prj_files',prj_name))  
   }
   
   print(rgcam::listQueries(prj))
@@ -131,7 +133,7 @@ create_prj <- function(db_name, desired_scen = NULL, prj_name = NULL) {
 #' @return dataframe with the specified query information
 data_query = function(type, db_path, db_name, prj_name, scenarios) {
   dt = data.frame()
-  xml <- xml2::read_xml(file.path(base_path, 'sdg_reporting', 'inst', 'extdata', 'queries_rfasst_nonCO2.xml'))
+  xml <- xml2::read_xml(file.path(base_path, 'gcam_sdg', 'inst', 'extdata', 'queries_rfasst_nonCO2.xml'))
   qq <- xml2::xml_find_first(xml, paste0("//*[@title='", type, "']"))
   
   full_nonCO2_emissions_list = c('BC','BC_AWB','C2F6','CF4','CH4','CH4_AGR','CH4_AWB','CO','CO_AWB','H2',

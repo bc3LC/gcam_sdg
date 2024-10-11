@@ -9,7 +9,7 @@ TBA
 ### SDG 2: Zero hunger
 Source: https://www.un.org/sustainabledevelopment/hunger/
 
-Script: [SDG2_Food_Basket_Bill.R](https://github.com/bc3LC/gcam_sdg/blob/main/R/SDG2_Food_Basket_Bill.R)
+Script: [SDG2_Food_Basket_Bill.R](https://github.com/bc3lc/gcam_sdg/blob/main/R/SDG2_Food_Basket_Bill.R)
 
 Description: 
 
@@ -22,7 +22,7 @@ $$\sum_{fc\ in\ foodNonStapleItems} ConsumptionPC_{fn,t,r} \cdot PricePCNonStapl
 ### SDG 3: Ensure healthy lives and promote well-being for all at all ages
 Source: https://www.un.org/sustainabledevelopment/health/
 
-Script: [SDG3_Health.R](https://github.com/bc3LC/gcam_sdg/blob/main/R/SDG3_Health.R)
+Script: [SDG3_Health.R](https://github.com/bc3lc/gcam_sdg/blob/main/R/SDG3_Health.R)
 
 Description: 
 
@@ -55,7 +55,7 @@ References SDG3
 ## SDG 6: Clean Water and Sanitation
 Source: https://www.un.org/sustainabledevelopment/water-and-sanitation/
 
-Script: [SDG6_Water_Scarcity.R](https://github.com/bc3LC/gcam_sdg/blob/main/R/SDG6_Water_Scarcity.R)
+Script: [SDG6_Water_Scarcity.R](https://github.com/bc3lc/gcam_sdg/blob/main/R/SDG6_Water_Scarcity.R)
 
 Description: 
 

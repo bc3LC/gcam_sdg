@@ -7,17 +7,17 @@ library(rfasst)
 run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
 
   # load SDG reporting scripts
-  source('R/SDG1_GDP.R')
-  source('R/SDG2_Food_Basket_Bill.R')
-  source('R/SDG3_Health.R')
-  source('R/SDG6_Water_Scarcity.R')
-  source('R/SDG15_Land_Indicator.R')
+  source('gcam_sdg/R/SDG1_GDP.R')
+  source('gcam_sdg/R/SDG2_Food_Basket_Bill.R')
+  source('gcam_sdg/R/SDG3_Health.R')
+  source('gcam_sdg/R/SDG6_Water_Scarcity.R')
+  source('gcam_sdg/R/SDG15_Land_Indicatr.R')
   
-  prj <- rgcam::loadProject("C:/GCAM_working_group/IAM COMPACT/gcam_bio_accounting/output/prj_files/gath_all_base.dat")
+  prj <- rgcam::loadProject("database_basexdb_sdgstudy_base.dat")
   final_db_year <- 2050
   saveOutput <- T
 
-  baseline_scen <- "SDGstudy_incr_base"
+#   baseline_scen <- "SDGstudy_incr_base"
   first_model_year <- 2020
 
   # SDG 1: GDP
@@ -109,12 +109,12 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
   # health <- get_sdg3_health(prj, final_db_year = 2050)
 
   # reading it exogenously for the number of scenarios
-  health_pre <- read.csv("C:/GCAM_working_group/IAM COMPACT/gcam_bio_accounting/output/SDG3-Health/mort.fin/mort.fin_ALL.csv") %>%
+  health_pre <- read.csv("C:/GCAM_working_group/IAM COMPACT/GCAM_v7p1_plus/output/SDG3-Health/mort.fin/mort.fin_ALL.csv") %>%
     group_by(scenario, year) %>%
     summarise(mort = sum(mort)) %>%
     ungroup()
 
-  health_base <- read.csv("C:/GCAM_working_group/IAM COMPACT/gcam_bio_accounting/output/SDG3-Health/mort.fin/mort.fin_ALL.csv") %>%
+  health_base <- read.csv("C:/GCAM_working_group/IAM COMPACT/GCAM_v7p1_plus/output/SDG3-Health/mort.fin/mort.fin_ALL.csv") %>%
     group_by(scenario, year) %>%
     summarise(mort = sum(mort)) %>%
     ungroup() %>%
@@ -202,7 +202,8 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
            sector = if_else(grepl("ind", scenario), "ind", sector),
            sector = if_else(grepl("bld", scenario), "bld", sector),
            sector = if_else(grepl("trn", scenario), "trn", sector),
-           sector = if_else(grepl("sup", scenario), "sup", sector)) %>%
+           sector = if_else(grepl("sup", scenario), "sup", sector),
+           sector = if_else(grepl("dac", scenario), "dac", sector)) %>%
     mutate(scenario = sub("_([^_]*)$", "_split_\\1", scenario)) %>%
     tidyr::separate(scenario, into = c("adj", "scenario"), sep = "_split_", extra = "merge", fill = "right") %>%
     select(-adj) %>%

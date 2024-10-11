@@ -8,9 +8,9 @@ args <- commandArgs(trailingOnly=TRUE)
 print(args)
 
 ## Set the working directory and load libraries
-setwd('/scratch/bc3LC/gcam_bio_accounting')
+setwd('/scratch/bc3lc/GCAM_v7p1_plus')
 libP <- .libPaths()
-.libPaths(c(libP,"/scratch/bc3LC/R-libs/4.1"))
+.libPaths(c(libP,"/scratch/bc3lc/R-libs/4.1"))
 
 library(dplyr)
 library(tidyr)
@@ -18,16 +18,17 @@ library(rgcam)
 library(rfasst)
 
 base_path <<- getwd()
-source(file.path('sdg_reporting','R','SDG3_Health.R'))
+source(file.path('gcam_sdg','R','SDG3_Health.R'))
 
 ## Extract the db name
 db_name <- args[1]
-db_name <- paste0('database_basexdb_',db_name)
+ssp <- args[2]
+db_name = paste0('database_basexdb_',toupper(ssp),'_',db_name)
 prj_name <- paste0(db_name, '.dat')
 print(paste0('Start SDG3 Health analysis for prj ', prj_name))
 
 ## Load prj
-prj <- rgcam::loadProject(file.path('output',prj_name))
+prj <- rgcam::loadProject(file.path('prj_files',prj_name))
 
 ## Run SDG3 Health
-get_sdg3_health(prj, saveOutput = T, makeFigures = F, final_db_year = 2050, prj_name = prj_name)
+get_sdg3_health(prj, saveOutput = T, makeFigures = F, final_db_year = 2050)

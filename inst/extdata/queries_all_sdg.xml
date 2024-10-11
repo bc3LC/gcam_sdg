@@ -69,12 +69,10 @@
   </aQuery>
   <aQuery>
     <all-regions/>
-    <supplyDemandQuery title="Ag Commodity Prices">
+    <supplyDemandQuery title="ag commodity prices">
       <axis1 name="sector">sector</axis1>
       <axis2 name="Year">cost</axis2>
-      <xPath buildList="true" dataName="yield" group="false" sumAll="false">*[@type='sector' and
-            (exists(child::keyword/@supplysector) or local-name() =
-            'AgSupplySector')]/cost/text()</xPath>
+      <xPath buildList="true" dataName="price" group="false" sumAll="false">*[@type='sector' and (local-name()='AgSupplySector')]/cost/text()</xPath>
       <comments/>
     </supplyDemandQuery>
   </aQuery>
@@ -179,59 +177,59 @@
   </aQuery>
   <aQuery>
     <all-regions/>
-            <supplyDemandQuery title="food demand by income group">
-                <axis1 name="input">input[@name]</axis1>
-                <axis2 name="Year">demand-physical[@vintage]</axis2>
-                <xPath buildList="true" dataName="demand" group="false" sumAll="false">gcam-consumer[@name='FoodDemand_Group1' or @name='FoodDemand_Group2' or @name='FoodDemand_Group3' or @name='FoodDemand_Group4' or @name='FoodDemand_Group5' or @name='FoodDemand_Group6' or @name='FoodDemand_Group7' or @name='FoodDemand_Group8' or @name='FoodDemand_Group9' or @name='FoodDemand_Group10']//*[@type='input']/demand-physical/node()</xPath>
-                <comments/>
-            </supplyDemandQuery>
+      <supplyDemandQuery title="food demand by income group">
+          <axis1 name="input">input[@name]</axis1>
+          <axis2 name="Year">demand-physical[@vintage]</axis2>
+          <xPath buildList="true" dataName="demand" group="false" sumAll="false">gcam-consumer[@name='FoodDemand_Group1' or @name='FoodDemand_Group2' or @name='FoodDemand_Group3' or @name='FoodDemand_Group4' or @name='FoodDemand_Group5' or @name='FoodDemand_Group6' or @name='FoodDemand_Group7' or @name='FoodDemand_Group8' or @name='FoodDemand_Group9' or @name='FoodDemand_Group10']//*[@type='input']/demand-physical/node()</xPath>
+          <comments/>
+      </supplyDemandQuery>
   </aQuery>
   <aQuery>
     <all-regions/>
-        <demographicsQuery title="subregional population">
-            <axis1 name="region">region</axis1>
-            <axis2 name="Year">subregional-population</axis2>
-            <xPath buildList="true" dataName="subregional-population" group="false" sumAll="false">gcam-consumer/subregional-population/node()</xPath>
-            <comments/>
-        </demographicsQuery>
+    <demographicsQuery title="subregional population">
+        <axis1 name="region">region</axis1>
+        <axis2 name="Year">subregional-population</axis2>
+        <xPath buildList="true" dataName="subregional-population" group="false" sumAll="false">gcam-consumer/subregional-population/node()</xPath>
+        <comments/>
+    </demographicsQuery>
   </aQuery>
   <aQuery>
     <all-regions/>
-        <demographicsQuery title="subregional income">
-            <axis1 name="region">region</axis1>
-            <axis2 name="Year">subregional-percapita-income</axis2>
-            <xPath buildList="true" dataName="subregional-percapita-income" group="false" sumAll="false">gcam-consumer/subregional-percapita-income/node()</xPath>
-            <comments/>
-        </demographicsQuery>
+    <demographicsQuery title="subregional income">
+        <axis1 name="region">region</axis1>
+        <axis2 name="Year">subregional-percapita-income</axis2>
+        <xPath buildList="true" dataName="subregional-percapita-income" group="false" sumAll="false">gcam-consumer/subregional-percapita-income/node()</xPath>
+        <comments/>
+    </demographicsQuery>
   </aQuery>
   <aQuery>
     <all-regions/>
-        <gdpQueryBuilder title="GDP MER by region">
-            <axis1 name="region">region</axis1>
-            <axis2 name="Year">nationalAccount[@year]</axis2>
-            <xPath buildList="true" dataName="gdp-mer" group="false" sumAll="false">nationalAccount/account[@name = 'GDP']/node()</xPath>
-            <comments/>
-        </gdpQueryBuilder>
+    <gdpQueryBuilder title="GDP MER by region">
+        <axis1 name="region">region</axis1>
+        <axis2 name="Year">nationalAccount[@year]</axis2>
+        <xPath buildList="true" dataName="gdp-mer" group="false" sumAll="false">nationalAccount/account[@name = 'GDP']/node()</xPath>
+        <comments/>
+    </gdpQueryBuilder>
   </aQuery>
   <aQuery>
     <all-regions/>
-                <supplyDemandQuery title="building service costs">
-                    <axis1 name="sector">sector</axis1>
-                    <axis2 name="Year">cost</axis2>
-                    <xPath buildList="true" dataName="cost" group="false" sumAll="false">*[@type='sector' and (@name='building' or (exists(child::keyword[@final-energy='building'])))]/
-               cost/text()</xPath>
-                    <comments/>
-                </supplyDemandQuery>
+    <supplyDemandQuery title="building service costs">
+        <axis1 name="sector">sector</axis1>
+        <axis2 name="Year">cost</axis2>
+        <xPath buildList="true" dataName="cost" group="false" sumAll="false">*[@type='sector' and (@name='building' or (exists(child::keyword[@final-energy='building'])))]/
+    cost/text()</xPath>
+        <comments/>
+    </supplyDemandQuery>
   </aQuery>
   <aQuery>
     <all-regions/>
-                <supplyDemandQuery title="building service output by service">
-                    <axis1 name="sector">sector</axis1>
-                    <axis2 name="Year">physical-output[@vintage]</axis2>
-                    <xPath buildList="true" dataName="output" group="false" sumAll="false">*[@type='sector' and (@name='building' or (exists(child::keyword[@final-energy='building'])))]//
-               output-primary[@type='output' (:collapse:)]/
-               physical-output/node()</xPath>
-                    <comments/>
-                </supplyDemandQuery>
+    <supplyDemandQuery title="building service output by service">
+        <axis1 name="sector">sector</axis1>
+        <axis2 name="Year">physical-output[@vintage]</axis2>
+        <xPath buildList="true" dataName="output" group="false" sumAll="false">*[@type='sector' and (@name='building' or (exists(child::keyword[@final-energy='building'])))]//
+    output-primary[@type='output' (:collapse:)]/
+    physical-output/node()</xPath>
+        <comments/>
+    </supplyDemandQuery>
   </aQuery>
 </queries>

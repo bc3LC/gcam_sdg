@@ -9,12 +9,13 @@ get_sdg2_food_basket_bill <- function(prj, saveOutput = T, makeFigures = F){
   print('computing sdg2 - food basket bill...')
 
   # Create the directories if they do not exist:
-  if (!dir.exists("output")) dir.create("output")
-  if (!dir.exists("output/SDG2-Poverty")) dir.create("output/SDG2-Poverty")
-  if (!dir.exists("output/SDG2-Poverty/figures")) dir.create("output/SDG2-Poverty/figures")
+  if (!dir.exists("ougcam_sdg/outputtput")) dir.create("gcam_sdg/output")
+  if (!dir.exists("gcam_sdg/output/SDG2-Poverty")) dir.create("gcam_sdg/output/SDG2-Poverty")
+  if (!dir.exists("gcam_sdg/output/SDG2-Poverty/indiv_results")) dir.create("gcam_sdg/output/SDG2-Poverty/indiv_results")
+  if (!dir.exists("gcam_sdg/output/SDG2-Poverty/figures")) dir.create("gcam_sdg/output/SDG2-Poverty/figures")
 
   # Perform computations
-  food_subsector <- read.csv(file.path('sdg_reporting','inst','extdata','food_subsector.csv'))
+  food_subsector <- read.csv(file.path('gcam_sdg','inst','extdata','food_subsector.csv'))
 
   food_basket_bill_regional <- rgcam::getQuery(prj, "food consumption by type (specific)") %>%
     dplyr::group_by(Units, region, scenario, subsector...4, subsector...5, technology, year) %>%
@@ -39,7 +40,7 @@ get_sdg2_food_basket_bill <- function(prj, saveOutput = T, makeFigures = F){
     dplyr::group_by(Units,region,scenario,year,supplysector) %>%
     dplyr::summarise(consumption = sum(value)) %>%
     # compute the expenditure by supplysector
-    dplyr::left_join(rgcam::getQuery(prj, "food demand prices") %>%
+    dplyr::left_join(rgcam::getQuery(prj, "food demand prices by income group") %>%
                        dplyr::group_by(Units, region, scenario, input, year) %>%
                        dplyr::summarise(value = sum(value)) %>%
                        dplyr::ungroup() %>%
@@ -70,7 +71,9 @@ get_sdg2_food_basket_bill <- function(prj, saveOutput = T, makeFigures = F){
     select(region, year, scenario, expenditure_percent_GDP) %>%
     mutate(units = 'percentage')
 
-  if (saveOutput) write.csv(food_basket_bill_percent_GDP, file = file.path('output/SDG2-Poverty','food_basket_bill_percent_GDP.csv'), row.names = F)
+  if (saveOutput) write.csv(food_basket_bill_percent_GDP, 
+                            file = file.path('gcam_sdg/output/SDG2-Poverty/indiv_results',paste0('SDG2_fbbPerGDP_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
+                            row.names = F)
 
   # compute GLOBAL food basket expenditure
   # consider the regional food basket bill with respect the GDP and weight it by the regional population
@@ -91,7 +94,9 @@ get_sdg2_food_basket_bill <- function(prj, saveOutput = T, makeFigures = F){
     summarise(expenditure_percent_GDP = sum(weighted_expenditure_percent_GDP)) %>%
     ungroup()
 
-  if (saveOutput) write.csv(food_basket_bill_percent_GDP_global, file = file.path('output/SDG2-Poverty','food_basket_bill_percent_GDP_global.csv'), row.names = F)
+  if (saveOutput) write.csv(food_basket_bill_percent_GDP_global, 
+                            file = file.path('gcam_sdg/output/SDG2-Poverty/indiv_results',paste0('SDG2_fbbPerGlobal_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")), 
+                            row.names = F)
 
   return(food_basket_bill_percent_GDP_global)
 }

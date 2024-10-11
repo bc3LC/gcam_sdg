@@ -8,20 +8,21 @@ args <- commandArgs(trailingOnly=TRUE)
 print(args)
 
 ## Set the working directory and load libraries
-setwd('/scratch/bc3LC/gcam_bio_accounting')
+setwd('/scratch/bc3lc/GCAM_v7p1_plus')
 libP <- .libPaths()
-.libPaths(c(libP,"/scratch/bc3LC/R-libs/4.1"))
+.libPaths(c(libP,"/scratch/bc3lc/R-libs/4.1"))
 
 library(dplyr)
 library(tidyr)
 library(rgcam)
 
 base_path <<- getwd()
-source(file.path('sdg_reporting','R','ancillay_functions_create_prj.R'))
+source(file.path('gcam_sdg','R','ancillary_functions_create_prj.R'))
 
 ## Extract the db name
 db_name <- args[1]
-db_name = paste0('database_basexdb_',db_name)
+ssp <- args[2]
+db_name = paste0('database_basexdb_',toupper(ssp),'_',db_name)
 print(paste0('Start prj creation for db ', db_name))
 
 ## Create the prj
