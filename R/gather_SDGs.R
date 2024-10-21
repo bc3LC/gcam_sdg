@@ -21,6 +21,23 @@ gather_indicators <- function(ssp) {
   save(dat_fin, file = file.path('gcam_sdg/output/SDG1-GDP/', paste0('SDG1-GDP_',ssp,'.RData')))
   write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG1-GDP/', paste0('SDG1-GDP_',ssp,'.csv')), row.names = F)
 
+  #################################### SDG1 ####################################
+  ## List all RData files and gather in one list
+  sub_prj_names <- c(list.files('/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG1-Expenditure/indiv_results', 
+                     pattern = paste0('^SDG1_totalWorldExpPer.*', ssp)))
+  base_path <- '/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG1-Expenditure/indiv_results'
+  fin.list <- list()
+  for (it in sub_prj_names) {
+    print(it)
+    tmp <- read.csv(file.path(base_path, it))
+    dat_fin <- dplyr::bind_rows(tmp)
+    fin.list[[it]] <- dat_fin
+  }
+  ## Gather and save
+  dat_fin <- dplyr::bind_rows(fin.list)
+  save(dat_fin, file = file.path('gcam_sdg/output/SDG1-Expenditure/', paste0('SDG1-Expenditure_',ssp,'.RData')))
+  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG1-Expenditure/', paste0('SDG1-Expenditure_',ssp,'.csv')), row.names = F)
+
   #################################### SDG2 ####################################
   ## List all RData files and gather in one list
   sub_prj_names <- c(list.files('/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG2-Poverty/indiv_results', pattern = paste0('fbbPerGlobal_',ssp)))
@@ -95,6 +112,11 @@ gather_indicators_ref <- function() {
   dat_fin <- read.csv(file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('sdgstudy_base')))[1]))
   save(dat_fin, file = file.path('gcam_sdg/output/SDG1-GDP/', paste0('SDG1-GDP_','REF','.RData')))
   write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG1-GDP/', paste0('SDG1-GDP_','REF','.csv')), row.names = F)
+
+  tag = 'SDG1-Expenditure/indiv_results'
+  dat_fin <- read.csv(file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('totalWorldExpPer_sdgstudy_base')))[1]))
+  save(dat_fin, file = file.path('gcam_sdg/output/SDG1-Expenditure/', paste0('SDG1-Expenditure_','REF','.RData')))
+  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG1-Expenditure/', paste0('SDG1-Expenditure_','REF','.csv')), row.names = F)
 
   tag = 'SDG2-Poverty/indiv_results'
   dat_fin <- read.csv(file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('fbbPerGlobal_sdgstudy_base')))[1]))

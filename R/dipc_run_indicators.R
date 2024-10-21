@@ -32,6 +32,7 @@ gather_indicators_ref()
 #### To compute final output (SSP vs REF)
 source(file.path('gcam_sdg','R','run_SDG_indicators.R'))
 gdp_final = data.frame()
+expenditure_final = data.frame()
 poverty_final = data.frame()
 health_final = data.frame()
 water_final = data.frame()
@@ -50,13 +51,15 @@ for (ssp in ssps) {
     print(ssp)
     output <- run_comparisson(ssp)
     gdp_final <- add_data(gdp_final, output[1])
-    poverty_final <- add_data(poverty_final, output[2])
-    health_final <- add_data(health_final, output[3])
-    water_final <- add_data(water_final, output[4])
+    expenditure_final <- add_data(expenditure_final, output[2])
+    poverty_final <- add_data(poverty_final, output[3])
+    health_final <- add_data(health_final, output[4])
+    water_final <- add_data(water_final, output[5])
 }
 
 sdg <- bind_rows(
     as.data.frame(gdp_final),
+    as.data.frame(expenditure_final),
     as.data.frame(poverty_final),
     as.data.frame(health_final),
     as.data.frame(water_final),
@@ -64,6 +67,6 @@ sdg <- bind_rows(
 arrange(sdg, as.numeric(Gt_CO2_reduction)) %>%
 dplyr::select(3, 1, 2, 4:33)
 
-write.csv(sdg, file = file.path("gcam_sdg/output","sdg_v1.csv"), row.names = F)
+write.csv(sdg, file = file.path("gcam_sdg/output","sdg_v2.csv"), row.names = F)
 
 
