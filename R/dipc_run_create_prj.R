@@ -22,7 +22,11 @@ source(file.path('gcam_sdg','R','ancillary_functions_create_prj.R'))
 ## Extract the db name
 db_name <- args[1]
 ssp <- args[2]
-db_name = paste0('database_basexdb_',toupper(ssp),'_',db_name)
+if (ssp != 'base') {
+    db_name = paste0('database_basexdb_',toupper(ssp),'_',db_name)
+} else {
+    db_name = paste0('database_basexdb_',db_name,'_',ssp)
+}
 print(paste0('Start prj creation for db ', db_name))
 
 ## Create the prj

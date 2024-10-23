@@ -4,7 +4,7 @@ library(rgcam)
 library(gcamdata)
 library(rfasst)
 
-run_indiv <- function(prj_name, saveOutput = T, makeFigures = F, final_db_year = 2050){
+run_indiv <- function(prj_name, ssp = NULL, saveOutput = T, makeFigures = F, final_db_year = 2050){
 
   prj <- rgcam::loadProject(file.path('prj_files',paste0(prj_name)))
   prj_name <<- prj_name
@@ -19,23 +19,23 @@ run_indiv <- function(prj_name, saveOutput = T, makeFigures = F, final_db_year =
   
   first_model_year <- 2020
 
-  # SDG 1: GDP
-  gdp_output <- get_sdg1_gdp(prj, saveOutput = T)
+  # # SDG 1: GDP
+  # gdp_output <- get_sdg1_gdp(prj, saveOutput = T)
 
   # SDG 1: Expenditure
-  expenditure_output <- get_sdg1_expenditure(prj, saveOutput = T)
+  expenditure_output <- get_sdg1_expenditure(prj, ssp, saveOutput = T)
 
-  # SDG 2: GDP
-  poverty_output <- get_sdg2_food_basket_bill(prj, saveOutput = T)
+  # # SDG 2: GDP
+  # poverty_output <- get_sdg2_food_basket_bill(prj, saveOutput = T)
 
-  # SDG 3: Health
-  health <- get_sdg3_health(prj, saveOutput = T)
+  # # SDG 3: Health
+  # health <- get_sdg3_health(prj, saveOutput = T)
 
-  # SDG 6
-  water_output <- get_sdg6_water_scarcity(prj, saveOutput = T)
+  # # SDG 6
+  # water_output <- get_sdg6_water_scarcity(prj, saveOutput = T)
 
-  # basics
-  pop_by_reg <- get_sdg0_pop(prj, saveOutput = T)
+  # # basics
+  # pop_by_reg <- get_sdg0_pop(prj, saveOutput = T)
 }
 
 
@@ -63,7 +63,8 @@ run_comparisson <- function(ssp, final_db_year = 2050){
 
   dat_list <- c(list.files(file.path(base_path, 'SDG0-POP'), pattern = paste0('.RData')))
   pop_by_reg <- extract_data(dat_list, file.path(base_path, 'SDG0-POP')) %>%
-    dplyr::filter(grepl(ssp, scenario))
+    dplyr::filter(grepl(ssp, scenario)) %>%
+    dplyr::distinct()
 
   gdp_pre <- tibble::as_tibble(gdp_output) %>%
     dplyr::mutate(Units = "Thous$/pers") %>%
@@ -117,17 +118,17 @@ run_comparisson <- function(ssp, final_db_year = 2050){
   expenditure <- tibble::as_tibble(expenditure_output) %>%
     gcamdata::left_join_error_no_match(tibble::as_tibble(expenditure_output) %>%
                                dplyr::filter(grepl('base', scenario)) %>%
-                               dplyr::rename(total_expenditure_per_base = total_expenditure_per) %>%
+                               dplyr::rename(total_expenditure_per_world_base = total_expenditure_per_world) %>%
                                dplyr::select(-scenario), by = c('year')) %>%
-    dplyr::mutate(unit = "perc_GDP") %>%
+    dplyr::mutate(unit = "perc_income") %>%
     dplyr::filter(year <= final_db_year,
            year >= first_model_year) %>%
-    dplyr::mutate(diff = total_expenditure_per - total_expenditure_per_base) %>%
+    dplyr::mutate(diff = total_expenditure_per_world - total_expenditure_per_world_base) %>%
     dplyr::group_by(scenario, unit) %>%
     dplyr::summarise(diff = mean(diff)) %>%
     dplyr::ungroup() %>%
     dplyr::filter(!grepl('base', scenario)) %>%
-    dplyr::mutate(sdg = "Expenditure",
+    dplyr::mutate(sdg = "Poverty",
            sector = dplyr::if_else(grepl("afolu", scenario), "afolu", "a"),
            sector = dplyr::if_else(grepl("ind", scenario), "ind", sector),
            sector = dplyr::if_else(grepl("bld", scenario), "bld", sector),
@@ -161,7 +162,7 @@ run_comparisson <- function(ssp, final_db_year = 2050){
     dplyr::summarise(diff = mean(diff)) %>%
     dplyr::ungroup() %>%
     dplyr::filter(!grepl('base', scenario)) %>%
-    dplyr::mutate(sdg = "Poverty",
+    dplyr::mutate(sdg = "Hunger",
            sector = dplyr::if_else(grepl("afolu", scenario), "afolu", "a"),
            sector = dplyr::if_else(grepl("ind", scenario), "ind", sector),
            sector = dplyr::if_else(grepl("bld", scenario), "bld", sector),

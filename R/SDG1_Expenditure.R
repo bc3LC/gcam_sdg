@@ -14,7 +14,7 @@ library(tidyr)
 #' values to real-world data
 #' World aggergation: we aggergate the decile-regional annual values weighted by population. For the indicator,
 #' we consider the 2020-2050 average output
-get_sdg1_expenditure <- function(prj, saveOutput = T, makeFigures = F){
+get_sdg1_expenditure <- function(prj, ssp, saveOutput = T, makeFigures = F){
   
   print('computing sdg1 - expenditure...')
   
@@ -35,16 +35,24 @@ get_sdg1_expenditure <- function(prj, saveOutput = T, makeFigures = F){
     dplyr::ungroup() %>% 
     dplyr::mutate(wpop = value / total) %>% 
     dplyr::select(scenario, region, year, wpop)
+
+  if (saveOutput) write.csv(population_weights, 
+                        file = file.path('gcam_sdg/output/SDG0-POP/indiv_results',paste0('SDG0_popw_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
+                        row.names = F)
+
   
   # INCOME
-  income <- rgcam::getQuery(prj, 'subregional income') %>% 
+  income <- rgcam::getQuery(prj_base, 'subregional income') %>% 
+    dplyr::filter(grepl(ssp, scenario)) %>%
     dplyr::filter(grepl('resid', `gcam-consumer`)) %>% 
     dplyr::mutate(`gcam-decile` = as.numeric(gsub("[^0-9.]", "", `gcam-consumer`))) %>%
     dplyr::select(-Units, income = value, -`gcam-consumer`) %>% 
     # Units: from thous. 1990$ per capita to 1900$ per capita
     dplyr::mutate(income = 1e3 * income) %>% 
     # fix South America_Northern
-    dplyr::mutate(income = dplyr::if_else(region == 'South America_Northern', 20 * income, income))
+    dplyr::mutate(income = dplyr::if_else(region == 'South America_Northern', 20 * income, income)) %>%
+    # remove the "scenario" column since we are using the income of the REF (base) scenario
+    dplyr::select(-scenario)
   
   # YEARS
   available_years <- c(1990, seq(2005, 2050, 5))
@@ -102,9 +110,9 @@ get_sdg1_expenditure <- function(prj, saveOutput = T, makeFigures = F){
   
   energy_expenditure_per <- energy_expenditure %>% 
     gcamdata::left_join_error_no_match(income,
-                                       by = c('scenario','region','gcam-decile','year')) %>% 
+                                       by = c('region','gcam-decile','year')) %>% 
     dplyr::mutate(energy_expenditure_per = 1e2 * energy_expenditure / income) %>% 
-    dplyr::select(scenario, region, year, energy_expenditure_per)
+    dplyr::select(scenario, region, `gcam-decile`, year, energy_expenditure_per)
   
   if (saveOutput) write.csv(energy_expenditure_per, 
                             file = file.path('gcam_sdg/output/SDG1-Expenditure/indiv_results',paste0('SDG1_energyExpPer_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
@@ -120,8 +128,8 @@ get_sdg1_expenditure <- function(prj, saveOutput = T, makeFigures = F){
   food_expenditure <- 
     # food prices
     rgcam::getQuery(prj, "food demand prices by income group") %>%
-    # # Units: from 2005$ to 2020$ (1990 to 2020: 0.5575288)
-    dplyr::mutate(value = value * gcamdata::gdp_deflator(1990, 2005) * 0.5575288) %>%
+    # Units: from 2005$ to 2020$ (1990 to 2020: 0.5575288)
+    dplyr::mutate(value = value * gcamdata::gdp_deflator(1990, 2005) / 0.5575288) %>%
     # Units: from Mcal to Pcal (1Mcal = 1e9Pcal)
     dplyr::mutate(value = value * 1e9) %>%
     # Units: from day to year (1year = 365.25days)
@@ -142,7 +150,7 @@ get_sdg1_expenditure <- function(prj, saveOutput = T, makeFigures = F){
     dplyr::group_by(scenario, region, `gcam-decile`, year) %>%
     dplyr::summarise(food_expenditure = sum(food_expenditure)) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(Units = '1990$') %>% 
+    dplyr::mutate(Units = '2020$') %>% 
     # compute per capita expenditure
     gcamdata::left_join_error_no_match(
       rgcam::getQuery(prj, "population by region") %>% 
@@ -151,7 +159,7 @@ get_sdg1_expenditure <- function(prj, saveOutput = T, makeFigures = F){
         dplyr::select(scenario, region, year, pop),
       by = c('scenario','region','year')) %>% 
     dplyr::mutate(food_expenditure = food_expenditure / pop) %>% 
-    dplyr::mutate(Units = '1990$cap')
+    dplyr::mutate(Units = '2020$cap')
   
   # compute the food multipliers
   food_mult <- food_expenditure %>% 
@@ -168,15 +176,16 @@ get_sdg1_expenditure <- function(prj, saveOutput = T, makeFigures = F){
   food_expenditure <- food_expenditure %>% 
     gcamdata::left_join_error_no_match(food_mult,
                                        by = c('scenario', 'region')) %>% 
-    dplyr::mutate(food_expenditure = food_mult * food_expenditure) %>% 
-    dplyr::select(scenario, region, year, food_expenditure, `gcam-decile`, Units)
+    dplyr::mutate(food_expenditure_mult = food_mult * food_expenditure) %>% 
+    dplyr::select(scenario, region, year, food_expenditure, food_expenditure_mult, food_mult, `gcam-decile`, Units)
   
   
   food_expenditure_per <- food_expenditure %>% 
-    gcamdata::left_join_error_no_match(income,
-                                       by = c('scenario','region','gcam-decile','year')) %>% 
-    dplyr::mutate(food_expenditure_per = 100 * food_expenditure / income) %>% 
-    dplyr::select(scenario, region, year, food_expenditure_per)
+    gcamdata::left_join_error_no_match(income %>%
+                                        dplyr::mutate(income = income / 0.5575288),
+                                       by = c('region','gcam-decile','year')) %>% 
+    dplyr::mutate(food_expenditure_per = 100 * food_expenditure_mult / income) %>%
+    dplyr::select(scenario, region, `gcam-decile`, year, food_expenditure_per)
   
   
   if (saveOutput) write.csv(food_expenditure_per, 
@@ -193,8 +202,9 @@ get_sdg1_expenditure <- function(prj, saveOutput = T, makeFigures = F){
                     food_expenditure_per + energy_expenditure_per)
     
   
-
-  # total_expenditure_per <- read.csv(file = file.path('gcam_sdg/output/SDG1-Expenditure/indiv_results',paste0('SDG1_totalExpPer_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")))
+  if (saveOutput) write.csv(total_expenditure_per, 
+                            file = file.path('gcam_sdg/output/SDG1-Expenditure/indiv_results',paste0('SDG1_totalExpPer_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
+                            row.names = F)
 
   # WORLD VALUES
   world_total_expenditure <-
@@ -202,19 +212,16 @@ get_sdg1_expenditure <- function(prj, saveOutput = T, makeFigures = F){
     gcamdata::left_join_error_no_match(tibble::as_tibble(population_weights),
                                        by = c('scenario','region','year')) %>%
     # weighted sum
-    dplyr::mutate(total_expenditure_per = total_expenditure_per * wpop) %>%
+    dplyr::mutate(total_expenditure_per_weighted = total_expenditure_per * wpop * 0.1) %>%
     dplyr::group_by(scenario, year) %>%
-    dplyr::summarise(total_expenditure_per = sum(total_expenditure_per)) %>%
+    dplyr::summarise(total_expenditure_per_world = sum(total_expenditure_per / 10) / sum(total_expenditure_per_weighted)) %>%
     dplyr::ungroup()
   
-  if (saveOutput) write.csv(total_expenditure_per, 
-                            file = file.path('gcam_sdg/output/SDG1-Expenditure/indiv_results',paste0('SDG1_totalExpPer_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
-                            row.names = F)
 
   if (saveOutput) write.csv(world_total_expenditure, 
                             file = file.path('gcam_sdg/output/SDG1-Expenditure/indiv_results',paste0('SDG1_totalWorldExpPer_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
                             row.names = F)
   
 
-  return(total_expenditure_per)
+  return(world_total_expenditure)
 }

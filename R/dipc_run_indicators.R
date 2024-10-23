@@ -12,15 +12,16 @@ ssps <- c('SSP1','SSP2','SSP3','SSP4','SSP5')
 
 #### To run all indicators
 source(file.path('gcam_sdg','R','run_SDG_indicators.R'))
+prj_base <- rgcam::loadProject(file.path('prj_files','database_basexdb_sdgstudy_base.dat'))
 for (ssp in ssps) {
     sub_prj_names <- c(list.files('/scratch/bc3lc/GCAM_v7p1_plus/prj_files', pattern = paste0('database_basexdb_',ssp)))
     for (prj_name in sub_prj_names) {
         print(paste0('Start indicators computation for prj ', prj_name))
-        run_indiv(prj_name)
+        run_indiv(prj_name, ssp = ssp)
         print('------------------------------------------------')
     }
 }
-run_indiv('database_basexdb_sdgstudy_base.dat')
+run_indiv('database_basexdb_sdgstudy_base.dat', ssp = 'base')
 
 #### To gather all indicators by SSP/REF
 source(file.path('gcam_sdg','R','gather_SDGs.R'))
@@ -64,9 +65,19 @@ sdg <- bind_rows(
     as.data.frame(health_final),
     as.data.frame(water_final),
 ) %>%
-arrange(sdg, as.numeric(Gt_CO2_reduction)) %>%
-dplyr::select(3, 1, 2, 4:33)
+arrange(sdg, as.numeric(Gt_CO2_reduction))
 
-write.csv(sdg, file = file.path("gcam_sdg/output","sdg_v2.csv"), row.names = F)
+# reorder columns
+manual_cols <- c("Gt_CO2_reduction","unit","sdg")
+afolu_cols <- grep("^afolu", names(sdg), value = TRUE)
+bld_cols <- grep("^bld", names(sdg), value = TRUE)
+dac_cols <- grep("^dac", names(sdg), value = TRUE)
+ind_cols <- grep("^ind", names(sdg), value = TRUE)
+sup_cols <- grep("^sup", names(sdg), value = TRUE)
+trn_cols <- grep("^trn", names(sdg), value = TRUE)
+final_col_order <- c(manual_cols, afolu_cols, bld_cols, dac_cols, ind_cols, sup_cols, trn_cols)
+sdg_ordered <- sdg[, final_col_order]
+
+write.csv(sdg_ordered, file = file.path("gcam_sdg/output","sdg_v4.csv"), row.names = F)
 
 
