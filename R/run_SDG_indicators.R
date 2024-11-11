@@ -23,7 +23,7 @@ run_indiv <- function(prj_name, ssp = NULL, saveOutput = T, makeFigures = F, fin
   # gdp_output <- get_sdg1_gdp(prj, saveOutput = T)
 
   # SDG 1: Expenditure
-  expenditure_output <- get_sdg1_expenditure(prj, ssp, saveOutput = T)
+  # expenditure_output <- get_sdg1_expenditure(prj, ssp, saveOutput = T)
 
   # # SDG 2: GDP
   # poverty_output <- get_sdg2_food_basket_bill(prj, saveOutput = T)
@@ -89,7 +89,7 @@ run_comparisson <- function(ssp, final_db_year = 2050){
     gcamdata::left_join_error_no_match(gdp_base, by = c('year', 'unit')) %>%
     dplyr::filter(year <= final_db_year,
            year >= first_model_year) %>%
-    dplyr::mutate(diff = GDPpc_thous - GDPpc_thous_base) %>%
+    dplyr::mutate(diff = (GDPpc_thous - GDPpc_thous_base)/GDPpc_thous_base) %>%
     dplyr::group_by(scenario, unit) %>%
     dplyr::summarise(diff = mean(diff)) %>%
     dplyr::ungroup() %>%
@@ -255,7 +255,38 @@ run_comparisson <- function(ssp, final_db_year = 2050){
                 values_from = diff) %>%
     arrange(as.numeric(Gt_CO2_reduction))
 
-  output <- list(gdp, expenditure, poverty, health, water)
+
+  # SDG 15
+  dat_list <- c(list.files(file.path(base_path, 'SDG15-Land'), pattern = paste0('.RData')))
+  land_output <- extract_data(dat_list, file.path(base_path, 'SDG15-Land')) %>%
+    dplyr::filter(grepl(ssp, scenario))
+
+  land <- tibble::as_tibble(land_output) %>%
+    dplyr::mutate(value_base = tibble::as_tibble(land_output) %>%
+                               dplyr::filter(grepl('base', scenario)) %>%
+                               dplyr::pull(value)) %>%
+    dplyr::mutate(diff = value - value_base) %>%
+    dplyr::group_by(scenario, unit = Units) %>%
+    dplyr::summarise(diff = mean(diff)) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(!grepl('base', scenario)) %>%
+    dplyr::mutate(sdg = "PSL",
+           sector = dplyr::if_else(grepl("afolu", scenario), "afolu", "a"),
+           sector = dplyr::if_else(grepl("ind", scenario), "ind", sector),
+           sector = dplyr::if_else(grepl("bld", scenario), "bld", sector),
+           sector = dplyr::if_else(grepl("trn", scenario), "trn", sector),
+           sector = dplyr::if_else(grepl("dac", scenario), "dac", sector),
+           sector = dplyr::if_else(grepl("sup", scenario), "sup", sector)) %>%
+    dplyr::mutate(scenario = sub("_([^_]*)$", "_split_\\1", scenario)) %>%
+    tidyr::separate(scenario, into = c("adj", "ssp"), sep = "_split_", extra = "merge", fill = "right") %>%
+    dplyr::mutate(Gt_CO2_reduction = as.numeric(unlist(stringr::str_extract_all(adj, "\\d+")))) %>%
+    dplyr::mutate(sector = paste0(sector, '_', tolower(ssp))) %>%
+    dplyr::select(-adj, -ssp) %>%
+    tidyr::pivot_wider(names_from = sector,
+                values_from = diff) %>%
+    arrange(as.numeric(Gt_CO2_reduction))
+
+  output <- list(gdp, expenditure, poverty, health, water, land)
   return(output)
 }
 
