@@ -37,6 +37,7 @@ expenditure_final = data.frame()
 poverty_final = data.frame()
 health_final = data.frame()
 water_final = data.frame()
+land_final = data.frame()
 
 add_data <- function(base_data, new_data) {
     base_data <- as.data.frame(base_data)
@@ -56,6 +57,7 @@ for (ssp in ssps) {
     poverty_final <- add_data(poverty_final, output[3])
     health_final <- add_data(health_final, output[4])
     water_final <- add_data(water_final, output[5])
+    land_final <- add_data(land_final, output[6])
 }
 
 sdg <- bind_rows(
@@ -64,6 +66,7 @@ sdg <- bind_rows(
     as.data.frame(poverty_final),
     as.data.frame(health_final),
     as.data.frame(water_final),
+    as.data.frame(land_final),
 ) %>%
 arrange(sdg, as.numeric(Gt_CO2_reduction))
 

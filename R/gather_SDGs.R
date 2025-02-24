@@ -88,6 +88,32 @@ gather_indicators <- function(ssp) {
   save(dat_fin, file = file.path('gcam_sdg/output/SDG6-Water/', paste0('SDG6-Water_',ssp,'.RData')))
   write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG6-Water/', paste0('SDG6-Water_',ssp,'.csv')), row.names = F)
 
+  #################################### SDG15 ####################################
+  ## List all RData files and gather in one list
+  sub_csv_names <- c(list.files('gcam_sdg/output/SDG15-Land/results/PSL-results', 
+                      paste0(".*", "pareto", ".*", ssp, ".*\\.csv$"), full.names = TRUE))
+  sub_csv_names <- sub_csv_names[!grepl("base", sub_csv_names)]
+  # Read each non-empty CSV file into a list of dataframes
+  fin.list <- lapply(sub_csv_names, function(file) {
+    # Check if the file is empty before reading
+    if (file.info(file)$size > 0) {
+      read.csv(file)
+    } else {
+      warning(paste("Skipping empty file:", file))
+      empty_files <<- c(empty_files, basename(file))  # Add the file name to the empty_files list
+      return(NULL)  # Return NULL for empty files
+    }
+  })
+  # Remove NULL entries from the list (corresponding to empty files)
+  fin.list <- fin.list[!sapply(fin.list, is.null)]
+  ## Gather and save
+  dat_fin <- bind_rows(fin.list) %>% 
+    dplyr::select(value = final_PSL, scenario) %>%
+    dplyr::mutate(Units = 'PSL',
+                  account = 'PSL')
+  save(dat_fin, file = file.path('gcam_sdg/output/SDG15-Land/', paste0('SDG15-PSL_',ssp,'.RData')))
+  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG15-Land/', paste0('SDG15-PSL_',ssp,'.csv')), row.names = F)
+
   #################################### SDG0 ####################################
   ## List all RData files and gather in one list
   sub_prj_names <- c(list.files('/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG0-POP/indiv_results', pattern = paste0('pop_',ssp)))
@@ -136,6 +162,15 @@ gather_indicators_ref <- function() {
   dat_fin <- read.csv(file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('wscarIndex_sdgstudy_base')))[1]))
   save(dat_fin, file = file.path('gcam_sdg/output/SDG6-Water/', paste0('SDG6-Water_','REF','.RData')))
   write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG6-Water/', paste0('SDG6-Water_','REF','.csv')), row.names = F)
+
+  tag = 'SDG15-Land/results/PSL-results'
+  file_list <- file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('base', ".*", "jan", ".*\\.csv$"))))
+  dat_fin <- bind_rows(lapply(file_list, read.csv)) %>% 
+    dplyr::select(value = final_PSL, scenario) %>%
+    dplyr::mutate(Units = 'PSL',
+                  account = 'PSL')
+  save(dat_fin, file = file.path('gcam_sdg/output/SDG15-Land/', paste0('SDG15-Land_','REF','.RData')))
+  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG15-Land/', paste0('SDG15-Land_','REF','.csv')), row.names = F)
 
   tag = 'SDG0-POP/indiv_results'
   dat_fin <- read.csv(file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('pop_sdgstudy_base')))[1])) 

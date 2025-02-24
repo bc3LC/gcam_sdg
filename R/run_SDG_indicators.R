@@ -19,23 +19,23 @@ run_indiv <- function(prj_name, ssp = NULL, saveOutput = T, makeFigures = F, fin
   
   first_model_year <- 2020
 
-  # # SDG 1: GDP
-  # gdp_output <- get_sdg1_gdp(prj, saveOutput = T)
+  # SDG 1: GDP
+  gdp_output <- get_sdg1_gdp(prj, saveOutput = T)
 
   # SDG 1: Expenditure
-  # expenditure_output <- get_sdg1_expenditure(prj, ssp, saveOutput = T)
+  expenditure_output <- get_sdg1_expenditure(prj, ssp, saveOutput = T)
 
-  # # SDG 2: GDP
-  # poverty_output <- get_sdg2_food_basket_bill(prj, saveOutput = T)
+  # SDG 2: GDP
+  poverty_output <- get_sdg2_food_basket_bill(prj, saveOutput = T)
 
-  # # SDG 3: Health
-  # health <- get_sdg3_health(prj, saveOutput = T)
+  # SDG 3: Health
+  health <- get_sdg3_health(prj, saveOutput = T)
 
-  # # SDG 6
-  # water_output <- get_sdg6_water_scarcity(prj, saveOutput = T)
+  # SDG 6
+  water_output <- get_sdg6_water_scarcity(prj, saveOutput = T)
 
-  # # basics
-  # pop_by_reg <- get_sdg0_pop(prj, saveOutput = T)
+  # basics
+  pop_by_reg <- get_sdg0_pop(prj, saveOutput = T)
 }
 
 
@@ -43,8 +43,12 @@ run_indiv <- function(prj_name, ssp = NULL, saveOutput = T, makeFigures = F, fin
 extract_data <- function(dat_list, pre_path) {
   dt <- data.frame()
   for (it in dat_list) {
-    tmp <- get(load(file.path(pre_path, it)))
-    dt = rbind(dt, tmp)
+    if (grepl('.csv',it)) {
+      tmp <- read.csv(file.path(pre_path, it))
+    } else {
+      tmp <- get(load(file.path(pre_path, it)))
+    }
+    dt <- rbind(dt, tmp)
   }
   return(dt)
 }
@@ -53,7 +57,7 @@ extract_data <- function(dat_list, pre_path) {
 # function to compute the final indicators of the SDGs (SSP vs REF)
 run_comparisson <- function(ssp, final_db_year = 2050){
 
-  base_path <- file.path(base_path, 'gcam_sdg/output')
+  # base_path <- file.path(base_path, 'gcam_sdg/output')
   first_model_year <- 2020
 
   # SDG 1: GDP
@@ -111,7 +115,8 @@ run_comparisson <- function(ssp, final_db_year = 2050){
     arrange(as.numeric(Gt_CO2_reduction))
 
   # SDG 1: Expenditure
-  dat_list <- c(list.files(file.path(base_path, 'SDG1-Expenditure'), pattern = paste0('.RData')))
+  dat_list <- c(list.files(file.path(base_path, 'SDG1-Expenditure'), pattern = paste0('.*',ssp,'.RData')))
+  dat_list <- c(dat_list, list.files(file.path(base_path, 'SDG1-Expenditure'), pattern = paste0('.*','REF','.RData')))
   expenditure_output <- extract_data(dat_list, file.path(base_path, 'SDG1-Expenditure')) %>%
     dplyr::filter(grepl(ssp, scenario))
 
