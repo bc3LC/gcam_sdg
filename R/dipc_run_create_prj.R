@@ -8,9 +8,6 @@ args <- commandArgs(trailingOnly=TRUE)
 print(args)
 
 ## Set the working directory and load libraries
-setwd('C:/GCAM_working_group/IAM COMPACT/GCAM_v7p1_plus')
-libP <- .libPaths()
-.libPaths(c(libP,"C:/GCAM_working_group/R_libs"))
 setwd('/scratch/bc3lc/GCAM_v7p1_plus')
 libP <- .libPaths()
 .libPaths(c(libP,"/scratch/bc3lc/R-libs/4.1"))

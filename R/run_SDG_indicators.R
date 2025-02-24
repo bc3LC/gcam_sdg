@@ -61,12 +61,12 @@ run_comparisson <- function(ssp, final_db_year = 2050){
   first_model_year <- 2020
 
   # SDG 1: GDP
-  dat_list <- c(list.files(file.path(base_path, 'SDG1-GDP/indiv_results'), pattern = paste0('pareto|base')))
-  gdp_output <- extract_data(dat_list, file.path(base_path, 'SDG1-GDP/indiv_results')) %>% 
+  dat_list <- c(list.files(file.path(base_path, 'SDG1-GDP'), pattern = paste0('.RData')))
+  gdp_output <- extract_data(dat_list, file.path(base_path, 'SDG1-GDP')) %>%
     dplyr::filter(grepl(ssp, scenario))
 
-  dat_list <- c(list.files(file.path(base_path, 'SDG0-POP/indiv_results'), pattern = paste0('pop_pareto|pop_sdgstudy_base')))
-  pop_by_reg <- extract_data(dat_list, file.path(base_path, 'SDG0-POP/indiv_results')) %>%
+  dat_list <- c(list.files(file.path(base_path, 'SDG0-POP'), pattern = paste0('.RData')))
+  pop_by_reg <- extract_data(dat_list, file.path(base_path, 'SDG0-POP')) %>%
     dplyr::filter(grepl(ssp, scenario)) %>%
     dplyr::distinct()
 
@@ -99,7 +99,12 @@ run_comparisson <- function(ssp, final_db_year = 2050){
     dplyr::ungroup() %>%
     dplyr::filter(!grepl('base', scenario)) %>%
     dplyr::mutate(sdg = "Economy",
-           sector = dplyr::if_else(grepl("pareto", scenario), "pareto", 'no-pareto')) %>%
+           sector = dplyr::if_else(grepl("afolu", scenario), "afolu", "a"),
+           sector = dplyr::if_else(grepl("ind", scenario), "ind", sector),
+           sector = dplyr::if_else(grepl("bld", scenario), "bld", sector),
+           sector = dplyr::if_else(grepl("trn", scenario), "trn", sector),
+           sector = dplyr::if_else(grepl("dac", scenario), "dac", sector),
+           sector = dplyr::if_else(grepl("sup", scenario), "sup", sector)) %>%
     dplyr::mutate(scenario = sub("_([^_]*)$", "_split_\\1", scenario)) %>%
     tidyr::separate(scenario, into = c("adj", "ssp"), sep = "_split_", extra = "merge", fill = "right") %>%
     dplyr::mutate(Gt_CO2_reduction = as.numeric(unlist(stringr::str_extract_all(adj, "\\d+")))) %>%
@@ -129,7 +134,12 @@ run_comparisson <- function(ssp, final_db_year = 2050){
     dplyr::ungroup() %>%
     dplyr::filter(!grepl('base', scenario)) %>%
     dplyr::mutate(sdg = "Poverty",
-                  sector = dplyr::if_else(grepl("pareto", scenario), "pareto", 'no-pareto')) %>%
+           sector = dplyr::if_else(grepl("afolu", scenario), "afolu", "a"),
+           sector = dplyr::if_else(grepl("ind", scenario), "ind", sector),
+           sector = dplyr::if_else(grepl("bld", scenario), "bld", sector),
+           sector = dplyr::if_else(grepl("trn", scenario), "trn", sector),
+           sector = dplyr::if_else(grepl("dac", scenario), "dac", sector),
+           sector = dplyr::if_else(grepl("sup", scenario), "sup", sector)) %>%
     dplyr::mutate(scenario = sub("_([^_]*)$", "_split_\\1", scenario)) %>%
     tidyr::separate(scenario, into = c("adj", "ssp"), sep = "_split_", extra = "merge", fill = "right") %>%
     dplyr::mutate(Gt_CO2_reduction = as.numeric(unlist(stringr::str_extract_all(adj, "\\d+")))) %>%
@@ -158,7 +168,12 @@ run_comparisson <- function(ssp, final_db_year = 2050){
     dplyr::ungroup() %>%
     dplyr::filter(!grepl('base', scenario)) %>%
     dplyr::mutate(sdg = "Hunger",
-                  sector = dplyr::if_else(grepl("pareto", scenario), "pareto", 'no-pareto')) %>%
+           sector = dplyr::if_else(grepl("afolu", scenario), "afolu", "a"),
+           sector = dplyr::if_else(grepl("ind", scenario), "ind", sector),
+           sector = dplyr::if_else(grepl("bld", scenario), "bld", sector),
+           sector = dplyr::if_else(grepl("trn", scenario), "trn", sector),
+           sector = dplyr::if_else(grepl("dac", scenario), "dac", sector),
+           sector = dplyr::if_else(grepl("sup", scenario), "sup", sector)) %>%
     dplyr::mutate(scenario = sub("_([^_]*)$", "_split_\\1", scenario)) %>%
     tidyr::separate(scenario, into = c("adj", "ssp"), sep = "_split_", extra = "merge", fill = "right") %>%
     dplyr::mutate(Gt_CO2_reduction = as.numeric(unlist(stringr::str_extract_all(adj, "\\d+")))) %>%
@@ -169,8 +184,8 @@ run_comparisson <- function(ssp, final_db_year = 2050){
     arrange(as.numeric(Gt_CO2_reduction))
 
   # SDG 3: Health
-  dat_list <- c(list.files(file.path(base_path, 'SDG3-Health/mort.fin'), pattern = paste0('pareto|base')))
-  health_output <- extract_data(dat_list, file.path(base_path, 'SDG3-Health/mort.fin')) %>% 
+  dat_list <- c(list.files(file.path(base_path, 'SDG3-Health'), pattern = paste0('.RData')))
+  health_output <- extract_data(dat_list, file.path(base_path, 'SDG3-Health')) %>%
     dplyr::filter(grepl(ssp, scenario))
 
   health_pre <- health_output %>%
@@ -194,7 +209,12 @@ run_comparisson <- function(ssp, final_db_year = 2050){
     dplyr::ungroup() %>%
     dplyr::filter(!grepl('base', scenario)) %>%
     dplyr::mutate(sdg = "Health",
-                  sector = dplyr::if_else(grepl("pareto", scenario), "pareto", 'no-pareto')) %>%
+           sector = dplyr::if_else(grepl("afolu", scenario), "afolu", "a"),
+           sector = dplyr::if_else(grepl("ind", scenario), "ind", sector),
+           sector = dplyr::if_else(grepl("bld", scenario), "bld", sector),
+           sector = dplyr::if_else(grepl("trn", scenario), "trn", sector),
+           sector = dplyr::if_else(grepl("dac", scenario), "dac", sector),
+           sector = dplyr::if_else(grepl("sup", scenario), "sup", sector)) %>%
     dplyr::mutate(scenario = sub("_([^_]*)$", "_split_\\1", scenario)) %>%
     tidyr::separate(scenario, into = c("adj", "ssp"), sep = "_split_", extra = "merge", fill = "right") %>%
     dplyr::mutate(Gt_CO2_reduction = as.numeric(unlist(stringr::str_extract_all(adj, "\\d+")))) %>%
@@ -225,7 +245,12 @@ run_comparisson <- function(ssp, final_db_year = 2050){
     dplyr::ungroup() %>%
     dplyr::filter(!grepl('base', scenario)) %>%
     dplyr::mutate(sdg = "Water",
-                  sector = dplyr::if_else(grepl("pareto", scenario), "pareto", 'no-pareto')) %>%
+           sector = dplyr::if_else(grepl("afolu", scenario), "afolu", "a"),
+           sector = dplyr::if_else(grepl("ind", scenario), "ind", sector),
+           sector = dplyr::if_else(grepl("bld", scenario), "bld", sector),
+           sector = dplyr::if_else(grepl("trn", scenario), "trn", sector),
+           sector = dplyr::if_else(grepl("dac", scenario), "dac", sector),
+           sector = dplyr::if_else(grepl("sup", scenario), "sup", sector)) %>%
     dplyr::mutate(scenario = sub("_([^_]*)$", "_split_\\1", scenario)) %>%
     tidyr::separate(scenario, into = c("adj", "ssp"), sep = "_split_", extra = "merge", fill = "right") %>%
     dplyr::mutate(Gt_CO2_reduction = as.numeric(unlist(stringr::str_extract_all(adj, "\\d+")))) %>%
@@ -251,7 +276,12 @@ run_comparisson <- function(ssp, final_db_year = 2050){
     dplyr::ungroup() %>%
     dplyr::filter(!grepl('base', scenario)) %>%
     dplyr::mutate(sdg = "PSL",
-                  sector = dplyr::if_else(grepl("pareto", scenario), "pareto", 'no-pareto')) %>%
+           sector = dplyr::if_else(grepl("afolu", scenario), "afolu", "a"),
+           sector = dplyr::if_else(grepl("ind", scenario), "ind", sector),
+           sector = dplyr::if_else(grepl("bld", scenario), "bld", sector),
+           sector = dplyr::if_else(grepl("trn", scenario), "trn", sector),
+           sector = dplyr::if_else(grepl("dac", scenario), "dac", sector),
+           sector = dplyr::if_else(grepl("sup", scenario), "sup", sector)) %>%
     dplyr::mutate(scenario = sub("_([^_]*)$", "_split_\\1", scenario)) %>%
     tidyr::separate(scenario, into = c("adj", "ssp"), sep = "_split_", extra = "merge", fill = "right") %>%
     dplyr::mutate(Gt_CO2_reduction = as.numeric(unlist(stringr::str_extract_all(adj, "\\d+")))) %>%
