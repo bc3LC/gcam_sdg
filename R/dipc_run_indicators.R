@@ -1,4 +1,7 @@
 ## Set the working directory and load libraries
+setwd('C:/GCAM_working_group/IAM COMPACT/GCAM_v7p1_plus')
+libP <- .libPaths()
+.libPaths(c(libP,"C:/GCAM_working_group/R_libs"))
 setwd('/scratch/bc3lc/GCAM_v7p1_plus')
 libP <- .libPaths()
 .libPaths(c(libP,"/scratch/bc3lc/R-libs/4.1"))
@@ -14,7 +17,7 @@ ssps <- c('SSP1','SSP2','SSP3','SSP4','SSP5')
 source(file.path('gcam_sdg','R','run_SDG_indicators.R'))
 prj_base <- rgcam::loadProject(file.path('prj_files','database_basexdb_sdgstudy_base.dat'))
 for (ssp in ssps) {
-    sub_prj_names <- c(list.files('/scratch/bc3lc/GCAM_v7p1_plus/prj_files', pattern = paste0('database_basexdb_',ssp)))
+    sub_prj_names <- c(list.files('/scratch/bc3lc/GCAM_v7p1_plus/prj_files', pattern = paste0('database_basexdb_pareto_',ssp)))
     for (prj_name in sub_prj_names) {
         print(paste0('Start indicators computation for prj ', prj_name))
         run_indiv(prj_name, ssp = ssp)
@@ -81,6 +84,6 @@ trn_cols <- grep("^trn", names(sdg), value = TRUE)
 final_col_order <- c(manual_cols, afolu_cols, bld_cols, dac_cols, ind_cols, sup_cols, trn_cols)
 sdg_ordered <- sdg[, final_col_order]
 
-write.csv(sdg_ordered, file = file.path("gcam_sdg/output","sdg_v4.csv"), row.names = F)
+write.csv(sdg_ordered, file = file.path("gcam_sdg/output","sdg_v8_pareto.csv"), row.names = F)
 
 
