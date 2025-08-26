@@ -3,8 +3,31 @@ This repository includes different scripts to automatically compute and report S
 
 ## SDG description
 
-### SDG 1:
-TBA
+### SDG 1: Poverty
+
+Source: https://www.un.org/sustainabledevelopment/poverty/
+
+Script: [SDG1_Expenditure.R](https://https://github.com/bc3LC/gcam_sdg/blob/main/R/SDG1_Expenditure.R)
+
+To measure the impact of mitigation pathways on poverty, we focus on household expenditures on residential (home) energy and food relative to their average income, reflecting the relative pressure on households to meet their basic needs. 
+
+This indicator is calculated for all representative households globally, which are based on 10 income deciles for each of the 32 socioeconomic regions in GCAM, combining to a total of 320 representative households. We then take the average value for all representative households weighted by the relative population in each group. While this includes results for households that do not suffer poverty, the quantification of “absolute poverty” is subjective, and we preferred to include relative poverty in the equation. The highest values in terms of expenditures, as well as variation between scenarios, will be found in the poorest households which have the smallest denominator (i.e., income), and hence these households will mainly drive the outcome of this indicator. For the interpretation of the indicator, one should thus wary that small global variations may include significant impacts in the poorest households.
+
+The following formula describes the calculation of the income expenditure share required for basic needs (IESBN):
+
+$$
+IESBN_{t,s} =
+\frac{
+    \sum_r \sum_h 
+    \left(
+        \frac{E_{t,s}}{I_{t,s}} + \frac{F_{t,s}}{I_{t,s}}
+    \right) \cdot pop_{t,s}
+}{
+    \sum_r \sum_h pop_{t,s}
+}
+$$
+
+Where $E reflects home energy expenditure, $F food expenditure, $I income, r the socioeconomic regions in GCAM, h the representative households (income deciles) within those regions, pop the population of the representative household in the region, t the model simulation year and r the scenario.
 
 ### SDG 2: Zero hunger
 Source: https://www.un.org/sustainabledevelopment/hunger/
@@ -82,19 +105,41 @@ References SDG6
 ## SDG15: Life of Land
 Source: https://www.un.org/sustainabledevelopment/biodiversity/
 
+Script: [SDG15 Life on Land.R](https://github.com/bc3lc/gcam_sdg/blob/main/R/SDG15_Land_Indicator.R)
+
 Description: 
 
-The land module is structured around 384 distinct land-water regions, called LUTs, and provides outputs on land allocation for 43 land uses per LUT. It computes supply, demand, and land utilisation in various sectors, encompassing food, feed, fiber, forestry, and bioenergy production. The land uses can be categorized into two broad sets: managed and unmanaged land. The latter includes unmanaged forests, unmanaged pasture, shrubland, grassland, tundra and other land types (e.g. rock, ice and desert). 
+The land module is structured around 384 distinct land-water regions, called LUTs, and provides outputs on land allocation for 43 land uses per LUT. It computes supply, demand, and land utilisation in various sectors, encompassing food, feed, fiber, forestry, and bioenergy production. The land uses are categorised into two categories, namely managed and unmanaged land. The latter includes unmanaged forests, unmanaged pasture, shrubland, grassland, tundra and other land uses (e.g., rock, ice and desert). 
 
-The indicator reported for SDG15 is the proportion of unmanaged land on total land area, which is assumed to represent the impact of anthropic activities, such as deforestation and land degradation, on the biological integrity of the global land system. The average value per scenario is computed by weighting values of LUTs by their total respective areas,  through the following equations: 
+The indicator reported for SDG15 is the net Potential Species Loss (PSL) indicator, which represents the number of plant and vertebrate species committed to extinction due to habitat loss through land use change (LUC) from unmanaged to managed land. The PSL indicator considers the current threat level faced by the species, the level of endemism, and the capacity of the species to adapt to this new habitat (Chaudhary et al., 2015; Chaudhary & Brooks, 2018). 
 
-$$P_{s,b}=100*UL_{s,b}/TL_{s,b}$$ 
+First, the land use projections from GCAM were downscaled with the Demeter model (Vernon et al., 2018) to increase the results’ resolution (0.5ºx0.5º) for the main land uses. These downscaled land use projections are then aggregated at the ecoregion level which is the spatial unit required to derive the biodiversity indicator.  (Chaudhary & Brooks, 2018). For each ecoregion and land use, the LUC is estimated as the area difference between 2020 and 2050. 
 
-and
+Second, the PSL is estimated from the ecoregion-based LUC projections and aggregated characterisation factors (CF). CFs provide PSL per unit area (ha) for five broad managed land uses (forestry, cropland, both irrigated and rainfed, pastureland, and urban land) under distinct management intensity levels for 804 terrestrial ecoregions. Extended Data Table 3 illustrates the matching between GCAM land uses and the land use types and management intensity of the CFs. 
 
-$$P_{s} = sum_{i=1}^i (P_{s,i} * TL_{s,i}) / sum_{i=1}^i TL_{s,i}$$
+The aggregated CFs reflect species loss across five taxa combined (mammals, birds, amphibians, reptiles and plants) and were obtained from Chaudhary & Brooks, (2018). The PSL indicator of each scenario is estimated with the following equations: 
 
-Where P is the unmanaged land proportion in %, UL is the area of unmanaged land in Mha, TL is the total area (managed and unmanaged) in Mha, i are the LUTs, and s are the scenarios. 
+
+$$
+LUC_{l,r} = A_{l,r,2050} - A_{l,r,2020}
+$$
+
+$$
+PSL_{l,r} = LUC_{l,r} \times CF_{l,r}
+$$
+
+$$
+PSL = \sum_l \sum_r PSL_{l,r}
+$$
+
+Where A is the area in ha, LUC is the land use change between 2020 and 2050 in ha, CF is the aggregated characterisation factor in species loss per ha, PSL is the net potential species loss of the scenario, l are the managed land uses, and r are the ecoregions.  
+
+References SDG15
+
+- Chaudhary, A., & Brooks, T. M. (2018). Land Use Intensity-Specific Global Characterization Factors to Assess Product Biodiversity Footprints. Environmental Science & Technology, 52(9), 5094–5104. https://doi.org/10.1021/acs.est.7b05570
+- Chaudhary, A., Verones, F., de Baan, L., & Hellweg, S. (2015). Quantifying Land Use Impacts on Biodiversity: Combining Species–Area Models and Vulnerability Indicators. Environmental Science & Technology, 49(16), 9987–9995. https://doi.org/10.1021/acs.est.5b02507
+- Vernon, C. R., Le Page, Y., Chen, M., Huang, M., Calvin, K. V., Kraucunas, I. P., & Braun, C. J. (2018). Demeter – A Land Use and Land Cover Change Disaggregation Model. Journal of Open Research Software, 6(1), 15. https://doi.org/10.5334/jors.208
+
 
 ## GCAM SDG studies
 
