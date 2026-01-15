@@ -19,8 +19,8 @@ library(gcamreport)
 ## INPUTS
 db_path <- "C:/GCAM_working_group/SUSMIP/gcam-cgs/output"
 db_name <- "database_basexdb_SUSMIP"
-# prj_name <- "../gcam-cgs/output/database_basexdb_SUSMIP_susmip_15Jan2026.dat"
-prj_name <- "../database_basexdb_SUSMIP_susmip_15Jan2026.dat"
+prj_name <- "../gcam-cgs/output/database_basexdb_SUSMIP_susmip_15Jan2026.dat"
+# prj_name <- "../database_basexdb_SUSMIP_susmip_15Jan2026.dat"
 scenarios <- c('SUSMIP_SUSTAINABLE','Baseline')
 final_year = 2100
 GCAM_version = 'vScenarioMIPCMIP7'
@@ -52,7 +52,7 @@ if (file.exists(prj_name)) {
 ## STEP 2
 ####################
 if (!dir.exists('output')) dir.create('output')
-prj_name_raw <- gsub("^\\.\\./|\\.dat$", "", prj_name)
+prj_name_raw <- gsub("\\.dat$", "", basename(prj_name))
 
 # Case 0: load gcamreport standardized output
 if (file.exists(paste0('output/',prj_name_raw,'.csv'))) {
@@ -63,13 +63,14 @@ if (file.exists(paste0('output/',prj_name_raw,'.csv'))) {
   generate_report(db_path = NULL, db_name = NULL, prj_name = prj_name, scenarios = scenarios,
                   final_year = final_year, GWP_version = GWP_version, GCAM_version = GCAM_version,
                   output_file = paste0('output/',prj_name_raw), launch_ui = launch_ui)
-
+  out_gcamreport <- report
   
 # Case B: run gcamreport creating the project
 } else {
   generate_report(db_path = db_path, db_name = db_name, prj_name = prj_name, scenarios = scenarios,
                   final_year = final_year, GWP_version = GWP_version, GCAM_version = GCAM_version,
                   output_file = paste0('output/',prj_name_raw), launch_ui = launch_ui)
+  out_gcamreport <- report
   
   
 }
