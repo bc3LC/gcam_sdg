@@ -109,12 +109,16 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
   # health <- get_sdg3_health(prj, final_db_year = 2050)
 
   # reading it exogenously for the number of scenarios
-  health_pre <- read.csv("C:/GCAM_working_group/IAM COMPACT/GCAM_v7p1_plus/output/SDG3-Health/mort.fin/mort.fin_ALL.csv") %>%
+  # (set options(gcam_sdg.base_path = ...) or GCAM_SDG_BASE_PATH to point this
+  # at a local run directory instead of the BC3 cluster default)
+  mort_fin_path <- file.path(gcam_sdg_base_path(), "output", "SDG3-Health", "mort.fin", "mort.fin_ALL.csv")
+
+  health_pre <- read.csv(mort_fin_path) %>%
     group_by(scenario, year) %>%
     summarise(mort = sum(mort)) %>%
     ungroup()
 
-  health_base <- read.csv("C:/GCAM_working_group/IAM COMPACT/GCAM_v7p1_plus/output/SDG3-Health/mort.fin/mort.fin_ALL.csv") %>%
+  health_base <- read.csv(mort_fin_path) %>%
     group_by(scenario, year) %>%
     summarise(mort = sum(mort)) %>%
     ungroup() %>%

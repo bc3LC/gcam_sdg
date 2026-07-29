@@ -28,11 +28,14 @@ get_sdg15_land_indicator <- function(prj, saveOutput = T, makeFigures = F){
   if (!dir.exists("gcam_sdg/output/SDG15-Land/results/PSL-results")) dir.create("gcam_sdg/output/SDG15-Land/results/PSL-results")
   if (!dir.exists("gcam_sdg/output/SDG15-Land/results/PSL-prj-results")) dir.create("gcam_sdg/output/SDG15-Land/results/PSL-prj-results")
   
-  # Set the dipc path for the GCAM folder
-  dipc_path = "/scratch/bc3lc/GCAM_v7p1_plus/"
-  
-  # Set the name of the conda environment read by reticulate
-  use_condaenv("/scratch/bc3lc/conda-env/dem-env-3", required=TRUE)
+  # Set the base path for the GCAM folder (defaults to the BC3 cluster path,
+  # override via options(gcam_sdg.base_path = ...) or GCAM_SDG_BASE_PATH)
+  dipc_path = paste0(gcam_sdg_base_path(), "/")
+
+  # Set the name of the conda environment read by reticulate (defaults to the
+  # BC3 cluster env, override via options(gcam_sdg.conda_env = ...) or
+  # GCAM_SDG_CONDA_ENV)
+  use_condaenv(gcam_sdg_conda_env(), required=TRUE)
   py_config()
   
   # Create vector of all scenarios in the project
@@ -58,7 +61,8 @@ get_sdg15_land_indicator <- function(prj, saveOutput = T, makeFigures = F){
   scenario_names <- unique(det.LU$scenario)
   
   # Create path for specific scenario
-  dir_demeter <- "/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/demeter-2.0/demeter/GCAM_demeter_protection_scenario/outputs"
+  demeter_root <- file.path(dipc_path, "gcam_sdg", "demeter-2.0", "demeter", "GCAM_demeter_protection_scenario")
+  dir_demeter <- file.path(demeter_root, "outputs")
   
   # Loop to create one file per scenario in "input/projected" demeter folder and configuration files
   for (scenario_name in scenario_names) {
@@ -67,8 +71,8 @@ get_sdg15_land_indicator <- function(prj, saveOutput = T, makeFigures = F){
     filtered_df <- det.LU[det.LU$scenario == scenario_name, ]
     
     # Define the file paths for saving the filtered dataframe and the configuration file
-    file_path <- paste0("/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/demeter-2.0/demeter/GCAM_demeter_protection_scenario/inputs/projected/Scenario_", scenario_name, ".csv")
-    config_path <- paste0("/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/demeter-2.0/demeter/GCAM_demeter_protection_scenario/config_files/Scenario_", scenario_name, ".ini")
+    file_path <- file.path(demeter_root, "inputs", "projected", paste0("Scenario_", scenario_name, ".csv"))
+    config_path <- file.path(demeter_root, "config_files", paste0("Scenario_", scenario_name, ".ini"))
     
     # Config file parameters
     projected_file <- paste0("Scenario_", scenario_name, ".csv")
@@ -76,7 +80,7 @@ get_sdg15_land_indicator <- function(prj, saveOutput = T, makeFigures = F){
     # Create the content for the config file
     config_file <- paste0(
       "[STRUCTURE]\n",
-      "run_dir =                       /scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/demeter-2.0/demeter/GCAM_demeter_protection_scenario\n",
+      "run_dir =                       ", demeter_root, "\n",
       "in_dir =                        inputs\n",
       "out_dir =                       outputs\n\n",
       "[INPUTS]\n",
@@ -157,10 +161,8 @@ get_sdg15_land_indicator <- function(prj, saveOutput = T, makeFigures = F){
     print(paste0("Importing and running Demeter for ", scenario_name))
     sys <- reticulate::import("sys")
     demeter <- reticulate::import("demeter")
-    config_path = "gcam_sdg/demeter-2.0/demeter/GCAM_demeter_protection_scenario/config_files/"
     config_name = paste0("Scenario_", scenario_name, ".ini")
-    # dipc_path = "/scratch/bc3lc/GCAM_v7p1_plus/"
-    config_file = paste0("/scratch/bc3lc/GCAM_v7p1_plus/",config_path, config_name)
+    config_file = file.path(demeter_root, "config_files", config_name)
     demeter$run_model(config_file=config_file, write_outputs=TRUE)
     print(paste0("Demeter run for scenario ", scenario_name, " completed"))
     
@@ -361,8 +363,8 @@ get_sdg15_land_indicator <- function(prj, saveOutput = T, makeFigures = F){
     # Delete the first column X
     final_agg = final_agg[,-1]
     
-    # write.xlsx(final_agg,paste0(dipc_path,"results/PSL-results/",scenario_name,"_PSL_2020_2050.xlsx"), overwrite = TRUE, rowNames=TRUE, colNames=TRUE)          
-    if (saveOutput) write.csv(final_agg,paste0("/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG15-Land/results/PSL-results/",scenario_name,"_PSL_2020_2050.csv"), row.names = F)       
+    # write.xlsx(final_agg,paste0(dipc_path,"results/PSL-results/",scenario_name,"_PSL_2020_2050.xlsx"), overwrite = TRUE, rowNames=TRUE, colNames=TRUE)
+    if (saveOutput) write.csv(final_agg, file.path(gcam_sdg_base_path(), "gcam_sdg", "output", "SDG15-Land", "results", "PSL-results", paste0(scenario_name, "_PSL_2020_2050.csv")), row.names = F)
     
     print(paste0("PSL dataframe for scenario ", scenario_name, " saved in results"))
     final_csv <- rbind(final_csv, final_agg)
