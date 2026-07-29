@@ -1,37 +1,37 @@
-## Set the working directory and load libraries
-setwd('/scratch/bc3lc/GCAM_v7p1_plus')
-libP <- .libPaths()
-.libPaths(c(libP,"/scratch/bc3lc/R-libs/4.1"))
+## Set the working directory and load the gcam_sdg package
+## Defaults to the BC3 "DIPC" cluster paths; override via the
+## GCAM_SDG_BASE_PATH / GCAM_SDG_RLIB_PATH environment variables to run
+## on a different machine.
+base_path <- Sys.getenv("GCAM_SDG_BASE_PATH", unset = "/scratch/bc3lc/GCAM_v7p1_plus")
+setwd(base_path)
+.libPaths(c(.libPaths(), Sys.getenv("GCAM_SDG_RLIB_PATH", unset = "/scratch/bc3lc/R-libs/4.1")))
 
 library(dplyr)
 library(tidyr)
 library(rgcam)
+devtools::load_all(file.path(base_path, "gcam_sdg"))
 
-base_path <<- getwd()
 ssps <- c('SSP1','SSP2','SSP3','SSP4','SSP5')
 
 #### To run all indicators
-source(file.path('gcam_sdg','R','run_SDG_indicators.R'))
 prj_base <- rgcam::loadProject(file.path('prj_files','database_basexdb_sdgstudy_base.dat'))
 for (ssp in ssps) {
-    sub_prj_names <- c(list.files('/scratch/bc3lc/GCAM_v7p1_plus/prj_files', pattern = paste0('database_basexdb_',ssp)))
+    sub_prj_names <- c(list.files(file.path(base_path, 'prj_files'), pattern = paste0('database_basexdb_',ssp)))
     for (prj_name in sub_prj_names) {
         print(paste0('Start indicators computation for prj ', prj_name))
-        run_indiv(prj_name, ssp = ssp)
+        run_indiv(prj_name, prj_base, ssp = ssp)
         print('------------------------------------------------')
     }
 }
-run_indiv('database_basexdb_sdgstudy_base.dat', ssp = 'base')
+run_indiv('database_basexdb_sdgstudy_base.dat', prj_base, ssp = 'base')
 
 #### To gather all indicators by SSP/REF
-source(file.path('gcam_sdg','R','gather_SDGs.R'))
 for (ssp in ssps) {
     gather_indicators(ssp)
 }
 gather_indicators_ref()
 
 #### To compute final output (SSP vs REF)
-source(file.path('gcam_sdg','R','run_SDG_indicators.R'))
 gdp_final = data.frame()
 expenditure_final = data.frame()
 poverty_final = data.frame()
@@ -51,7 +51,7 @@ add_data <- function(base_data, new_data) {
 
 for (ssp in ssps) {
     print(ssp)
-    output <- run_comparisson(ssp)
+    output <- run_comparisson(ssp, base_path)
     gdp_final <- add_data(gdp_final, output[1])
     expenditure_final <- add_data(expenditure_final, output[2])
     poverty_final <- add_data(poverty_final, output[3])
@@ -82,5 +82,3 @@ final_col_order <- c(manual_cols, afolu_cols, bld_cols, dac_cols, ind_cols, sup_
 sdg_ordered <- sdg[, final_col_order]
 
 write.csv(sdg_ordered, file = file.path("gcam_sdg/output","sdg_v4.csv"), row.names = F)
-
-

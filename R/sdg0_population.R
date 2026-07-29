@@ -6,11 +6,12 @@ library(tidyr)
 #' Extract population by region, used as the population base for the other
 #' SDG indicators (e.g. population weighting in SDG1, SDG2).
 #' @param prj uploaded project file
+#' @param prj_name project file name, used to tag the saved output file
 #' @param saveOutput save the produced output
 #' @param makeFigures generate and save graphical representation/s of the output
 #' @return data frame with population by region, scenario and year
 #' @export
-get_sdg0_pop <- function(prj, saveOutput = T, makeFigures = F){
+get_sdg0_pop <- function(prj, prj_name, saveOutput = T, makeFigures = F){
 
   print('computing sdg0 - POP...')
   

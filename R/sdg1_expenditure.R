@@ -14,12 +14,16 @@ library(tidyr)
 #' World aggregation: decile-regional annual values weighted by population.
 #' The indicator itself considers the 2020-2050 average output.
 #' @param prj uploaded project file
+#' @param prj_name project file name, used to tag saved output files
 #' @param ssp SSP tag used to select the matching income scenario (or "base")
+#' @param prj_base rgcam project holding the baseline (REF) scenario's
+#'   `subregional income` query, used as the income denominator
+#' @param final_db_year last model year to consider
 #' @param saveOutput save the produced output
 #' @param makeFigures generate and save graphical representation/s of the output
 #' @return data frame with the global population-weighted expenditure share of income by scenario and year
 #' @export
-get_sdg1_expenditure <- function(prj, ssp, saveOutput = T, makeFigures = F){
+get_sdg1_expenditure <- function(prj, prj_name, ssp, prj_base, final_db_year = 2050, saveOutput = T, makeFigures = F){
   
   print('computing sdg1 - expenditure...')
   

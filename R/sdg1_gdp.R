@@ -6,11 +6,12 @@ library(tidyr)
 #' Extract GDP per capita (PPP) by region, used as the SDG 1 (Poverty) economy
 #' metric and as an input to SDG2's food-basket-bill-as-%-of-GDP calculation.
 #' @param prj uploaded project file
+#' @param prj_name project file name, used to tag the saved output file
 #' @param saveOutput save the produced output
 #' @param makeFigures generate and save graphical representation/s of the output
 #' @return data frame with GDP per capita (PPP) by region, scenario and year
 #' @export
-get_sdg1_gdp <- function(prj, saveOutput = T, makeFigures = F){
+get_sdg1_gdp <- function(prj, prj_name, saveOutput = T, makeFigures = F){
 
   print('computing sdg1 - GDP...')
   

@@ -6,11 +6,12 @@ library(tidyr)
 #' Compute SDG 2 (Zero Hunger) as the per-capita food basket bill, expressed
 #' as a percentage of GDP, weighted globally by population.
 #' @param prj uploaded project file
+#' @param prj_name project file name, used to tag the saved output file
 #' @param saveOutput save the produced output
 #' @param makeFigures generate and save graphical representation/s of the output
 #' @return data frame with the global food basket bill (% GDP) by scenario and year
 #' @export
-get_sdg2_food_basket_bill <- function(prj, saveOutput = T, makeFigures = F){
+get_sdg2_food_basket_bill <- function(prj, prj_name, saveOutput = T, makeFigures = F){
 
   print('computing sdg2 - food basket bill...')
 
@@ -63,7 +64,7 @@ get_sdg2_food_basket_bill <- function(prj, saveOutput = T, makeFigures = F){
     dplyr::ungroup()
 
   # report food basket expenditure as % of the GDP
-  GDP <- get_sdg1_gdp(prj) %>%
+  GDP <- get_sdg1_gdp(prj, prj_name) %>%
     rename(GDP = value) %>%
     # take care of units
     mutate(GDP = GDP * 1e-6) %>% # million 1990$ to 1990$

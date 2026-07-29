@@ -4,42 +4,54 @@ library(rgcam)
 library(gcamdata)
 library(rfasst)
 
-run_indiv <- function(prj_name, ssp = NULL, saveOutput = T, makeFigures = F, final_db_year = 2050){
+#' run_indiv
+#'
+#' Compute all SDG indicators for a single GCAM project file and save each
+#' one's individual results to disk (used by the per-scenario HPC loop in
+#' scripts/hpc/dipc_run_indicators.R).
+#' @param prj_name project file name (under prj_files/)
+#' @param prj_base rgcam project holding the baseline (REF) scenario, passed
+#'   through to get_sdg1_expenditure() for the income denominator
+#' @param ssp SSP tag used to select the matching income scenario (or "base")
+#' @param saveOutput save the produced output
+#' @param makeFigures generate and save graphical representation/s of the output
+#' @param final_db_year last model year to consider
+#' @return invisibly writes each SDG's individual output under gcam_sdg/output/
+#' @export
+run_indiv <- function(prj_name, prj_base, ssp = NULL, saveOutput = T, makeFigures = F, final_db_year = 2050){
 
   prj <- rgcam::loadProject(file.path('prj_files',paste0(prj_name)))
-  prj_name <<- prj_name
 
-  # load SDG reporting scripts
-  source('gcam_sdg/R/SDG1_GDP.R')
-  source('gcam_sdg/R/SDG1_Expenditure.R')
-  source('gcam_sdg/R/SDG2_Food_Basket_Bill.R')
-  source('gcam_sdg/R/SDG3_Health.R')
-  source('gcam_sdg/R/SDG6_Water_Scarcity.R')
-  source('gcam_sdg/R/SDG0_Population.R')
-  
   first_model_year <- 2020
 
   # SDG 1: GDP
-  gdp_output <- get_sdg1_gdp(prj, saveOutput = T)
+  gdp_output <- get_sdg1_gdp(prj, prj_name, saveOutput = T)
 
   # SDG 1: Expenditure
-  expenditure_output <- get_sdg1_expenditure(prj, ssp, saveOutput = T)
+  expenditure_output <- get_sdg1_expenditure(prj, prj_name, ssp, prj_base, final_db_year = final_db_year, saveOutput = T)
 
   # SDG 2: GDP
-  poverty_output <- get_sdg2_food_basket_bill(prj, saveOutput = T)
+  poverty_output <- get_sdg2_food_basket_bill(prj, prj_name, saveOutput = T)
 
   # SDG 3: Health
-  health <- get_sdg3_health(prj, saveOutput = T)
+  health <- get_sdg3_health(prj, prj_name, saveOutput = T, final_db_year = final_db_year)
 
   # SDG 6
-  water_output <- get_sdg6_water_scarcity(prj, saveOutput = T)
+  water_output <- get_sdg6_water_scarcity(prj, prj_name, saveOutput = T)
 
   # basics
-  pop_by_reg <- get_sdg0_pop(prj, saveOutput = T)
+  pop_by_reg <- get_sdg0_pop(prj, prj_name, saveOutput = T)
 }
 
 
-# function to extract and bind all data of a given list of RData items
+#' extract_data
+#'
+#' Read and bind a list of gathered SDG indicator .RData/.csv files into a
+#' single data frame.
+#' @param dat_list file names (relative to pre_path) to read and bind
+#' @param pre_path directory containing the files in dat_list
+#' @return combined data frame
+#' @export
 extract_data <- function(dat_list, pre_path) {
   dt <- data.frame()
   for (it in dat_list) {
@@ -54,10 +66,18 @@ extract_data <- function(dat_list, pre_path) {
 }
 
 
-# function to compute the final indicators of the SDGs (SSP vs REF)
-run_comparisson <- function(ssp, final_db_year = 2050){
+#' run_comparisson
+#'
+#' Compute the final SDG indicators (SSP vs. REF) from the gathered
+#' per-scenario indicator files written by gather_indicators().
+#' @param ssp SSP tag to filter scenarios by
+#' @param base_path directory containing the gathered SDGx-... indicator
+#'   subfolders (the same value used when the indicators were gathered)
+#' @param final_db_year last model year to consider
+#' @return list of data frames: gdp, expenditure, poverty, health, water, land
+#' @export
+run_comparisson <- function(ssp, base_path, final_db_year = 2050){
 
-  # base_path <- file.path(base_path, 'gcam_sdg/output')
   first_model_year <- 2020
 
   # SDG 1: GDP

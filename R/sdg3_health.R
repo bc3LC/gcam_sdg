@@ -10,12 +10,13 @@ library(rfasst)
 #' exposure to PM2.5 and O3, using rfasst, downscaled to country level by
 #' population share and re-aggregated to GCAM region.
 #' @param prj uploaded project file
+#' @param prj_name project file name, used to tag the saved output file
 #' @param saveOutput save the produced output
 #' @param makeFigures generate and save graphical representation/s of the output
 #' @param final_db_year last model year to consider
 #' @return data frame with mortalities by scenario, GCAM region and year
 #' @export
-get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
+get_sdg3_health <- function(prj, prj_name, saveOutput = T, makeFigures = F, final_db_year = 2050){
   
   print('computing sdg3 - health impacts......')
   

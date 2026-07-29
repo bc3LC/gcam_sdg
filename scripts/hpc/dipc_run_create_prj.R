@@ -7,17 +7,18 @@
 args <- commandArgs(trailingOnly=TRUE)
 print(args)
 
-## Set the working directory and load libraries
-setwd('/scratch/bc3lc/GCAM_v7p1_plus')
-libP <- .libPaths()
-.libPaths(c(libP,"/scratch/bc3lc/R-libs/4.1"))
+## Set the working directory and load the gcam_sdg package
+## Defaults to the BC3 "DIPC" cluster paths; override via the
+## GCAM_SDG_BASE_PATH / GCAM_SDG_RLIB_PATH environment variables to run
+## on a different machine.
+base_path <- Sys.getenv("GCAM_SDG_BASE_PATH", unset = "/scratch/bc3lc/GCAM_v7p1_plus")
+setwd(base_path)
+.libPaths(c(.libPaths(), Sys.getenv("GCAM_SDG_RLIB_PATH", unset = "/scratch/bc3lc/R-libs/4.1")))
 
 library(dplyr)
 library(tidyr)
 library(rgcam)
-
-base_path <<- getwd()
-source(file.path('gcam_sdg','R','ancillary_functions_create_prj.R'))
+devtools::load_all(file.path(base_path, "gcam_sdg"))
 
 ## Extract the db name
 db_name <- args[1]
@@ -30,4 +31,4 @@ if (ssp != 'base') {
 print(paste0('Start prj creation for db ', db_name))
 
 ## Create the prj
-create_prj(db_name)
+create_prj(db_name, base_path)

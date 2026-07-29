@@ -7,11 +7,12 @@ library(tidyr)
 #' indicator, downscaling GCAM land allocation with Demeter and aggregating
 #' land-use change to the ecoregion level.
 #' @param prj uploaded project file
+#' @param prj_name project file name, used to tag the saved output file
 #' @param saveOutput save the produced output
 #' @param makeFigures generate and save graphical representation/s of the output
 #' @return data frame with the final PSL by scenario
 #' @export
-get_sdg15_land_indicator <- function(prj, saveOutput = T, makeFigures = F){
+get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures = F){
 
   print('computing sdg15 - land indicator ...')
 
@@ -167,7 +168,7 @@ get_sdg15_land_indicator <- function(prj, saveOutput = T, makeFigures = F){
     print(paste0("Demeter run for scenario ", scenario_name, " completed"))
     
   }
-  print(paste0("Demeter runs completed for all scenarios of database ", db_name))
+  print(paste0("Demeter runs completed for all scenarios of database ", prj_name))
   
   # Extract surfaces by land use type from the netCDF files
   year <- c('2020','2050')

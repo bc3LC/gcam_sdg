@@ -4,16 +4,24 @@ library(rgcam)
 library(gcamdata)
 library(rfasst)
 
+#' run
+#'
+#' Interactive/one-off entry point: compute all SDG indicators for the
+#' scenarios in the fixed "sdgstudy_base" GCAM database and write the
+#' combined SDG deliverable table. Requires `baseline_scen` to already be
+#' set in the calling environment (the name of the baseline scenario to
+#' diff every other scenario against).
+#' @param prj unused - the project is loaded internally from a fixed
+#'   database name; kept for interface compatibility
+#' @param saveOutput save the produced output
+#' @param makeFigures generate and save graphical representation/s of the output
+#' @param final_db_year last model year to consider
+#' @return invisibly writes output/sdg_Deliverable.csv
+#' @export
 run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
 
-  # load SDG reporting scripts
-  source('gcam_sdg/R/SDG1_GDP.R')
-  source('gcam_sdg/R/SDG2_Food_Basket_Bill.R')
-  source('gcam_sdg/R/SDG3_Health.R')
-  source('gcam_sdg/R/SDG6_Water_Scarcity.R')
-  source('gcam_sdg/R/SDG15_Land_Indicatr.R')
-  
-  prj <- rgcam::loadProject("database_basexdb_sdgstudy_base.dat")
+  prj_name <- "database_basexdb_sdgstudy_base.dat"
+  prj <- rgcam::loadProject(prj_name)
   final_db_year <- 2050
   saveOutput <- T
 
@@ -21,7 +29,7 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
   first_model_year <- 2020
 
   # SDG 1: GDP
-  gdp_output <- get_sdg1_gdp(prj, saveOutput = F)
+  gdp_output <- get_sdg1_gdp(prj, prj_name, saveOutput = F)
 
   gdp_pre <- gdp_output %>%
     mutate(Units = "Thous$/pers") %>%
@@ -60,7 +68,7 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
     postprocess_sdg_diff("Economy", baseline_scen, match = "exact")
 
   # SDG 2: GDP
-  poverty_output <- get_sdg2_food_basket_bill(prj, saveOutput = F)
+  poverty_output <- get_sdg2_food_basket_bill(prj, prj_name, saveOutput = F)
 
   poverty <- poverty_output %>%
     left_join_error_no_match(poverty_output %>%
@@ -75,7 +83,7 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
     postprocess_sdg_diff("Poverty", baseline_scen, match = "exact")
 
   # SDG 3: Health
-  # health <- get_sdg3_health(prj, final_db_year = 2050)
+  # health <- get_sdg3_health(prj, prj_name, final_db_year = 2050)
 
   # reading it exogenously for the number of scenarios
   # (set options(gcam_sdg.base_path = ...) or GCAM_SDG_BASE_PATH to point this
@@ -104,7 +112,7 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
     postprocess_sdg_diff("Health", baseline_scen, match = "exact")
 
   # SDG 6
-  water_output <- get_sdg6_water_scarcity(prj,saveOutput = F)
+  water_output <- get_sdg6_water_scarcity(prj, prj_name, saveOutput = F)
 
   water <- water_output %>%
     filter(resource == "runoff") %>%
@@ -123,7 +131,7 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
   
   # SDG 15: Land
   # Test new proj file with detailed land allocation in all scens
-  land_output <- get_sdg15_land_indicator(prj, saveOutput = F)
+  land_output <- get_sdg15_land_indicator(prj, prj_name, saveOutput = F)
 
   land <- land_output %>%
     filter(year <= final_db_year,

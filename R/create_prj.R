@@ -5,11 +5,13 @@
 #'
 #' Function to create a GCAM project provided a database and a queries file
 #' @param db_name name of the database. It will The extension will be automatically added if not present
+#' @param base_path run directory containing the `output/` (GCAM databases)
+#'   and `prj_files/` folders. See gcam_sdg_base_path().
 #' @param desired_scen desired scenarios. If NULL, all the scenarios present in the database will be considered
 #' @param prj_name name of the project. If NULL, it will be the defult option, i.e., the database name. Otherwise specify
 #' @return create the specified project
 #' @export
-create_prj <- function(db_name, desired_scen = NULL, prj_name = NULL) {
+create_prj <- function(db_name, base_path, desired_scen = NULL, prj_name = NULL) {
   db_path <- file.path(base_path,'output')
   query_path <- system.file("extdata", package = "gcam_sdg")
   

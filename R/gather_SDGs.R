@@ -1,14 +1,20 @@
-# ## Set the working directory and load libraries
-# setwd('/scratch/bc3lc/GCAM_v7p1_plus')
-# libP <- .libPaths()
-# .libPaths(c(libP,"/scratch/bc3lc/R-libs/4.1"))
-
-## SSPs
+#' gather_indicators
+#'
+#' Gather the per-scenario individual SDG indicator files (written by
+#' run_indiv() across all scenarios of a given SSP) into one combined
+#' RData/csv file per SDG. Reads from
+#' `<gcam_sdg_base_path()>/gcam_sdg/output/<SDG>/...` and writes to
+#' `gcam_sdg/output/<SDG>/` relative to the current working directory.
+#' @param ssp SSP tag used to select the matching per-scenario files
+#' @return invisibly writes one combined RData/csv pair per SDG
+#' @export
 gather_indicators <- function(ssp) {
+  root <- file.path(gcam_sdg_base_path(), 'gcam_sdg', 'output')
+
   #################################### SDG1 ####################################
   ## List all RData files and gather in one list
-  sub_prj_names <- c(list.files('/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG1-GDP/indiv_results', pattern = ssp))
-  base_path <- '/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG1-GDP/indiv_results'
+  sub_prj_names <- c(list.files(file.path(root, 'SDG1-GDP', 'indiv_results'), pattern = ssp))
+  base_path <- file.path(root, 'SDG1-GDP', 'indiv_results')
   fin.list <- list()
   for (it in sub_prj_names) {
     print(it)
@@ -23,9 +29,9 @@ gather_indicators <- function(ssp) {
 
   #################################### SDG1 ####################################
   ## List all RData files and gather in one list
-  sub_prj_names <- c(list.files('/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG1-Expenditure/indiv_results', 
+  sub_prj_names <- c(list.files(file.path(root, 'SDG1-Expenditure', 'indiv_results'),
                      pattern = paste0('^SDG1_totalWorldExpPer.*', ssp)))
-  base_path <- '/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG1-Expenditure/indiv_results'
+  base_path <- file.path(root, 'SDG1-Expenditure', 'indiv_results')
   fin.list <- list()
   for (it in sub_prj_names) {
     print(it)
@@ -42,8 +48,8 @@ gather_indicators <- function(ssp) {
 
   #################################### SDG2 ####################################
   ## List all RData files and gather in one list
-  sub_prj_names <- c(list.files('/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG2-Poverty/indiv_results', pattern = paste0('fbbPerGlobal_',ssp)))
-  base_path <- '/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG2-Poverty/indiv_results'
+  sub_prj_names <- c(list.files(file.path(root, 'SDG2-Poverty', 'indiv_results'), pattern = paste0('fbbPerGlobal_',ssp)))
+  base_path <- file.path(root, 'SDG2-Poverty', 'indiv_results')
   fin.list <- list()
   for (it in sub_prj_names) {
     print(it)
@@ -58,8 +64,8 @@ gather_indicators <- function(ssp) {
 
   #################################### SDG3 ####################################
   ## List all RData files and gather in one list
-  sub_prj_names <- c(list.files('/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG3-Health/mort.fin', pattern = ssp))
-  base_path <- '/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG3-Health/mort.fin'
+  sub_prj_names <- c(list.files(file.path(root, 'SDG3-Health', 'mort.fin'), pattern = ssp))
+  base_path <- file.path(root, 'SDG3-Health', 'mort.fin')
   fin.list <- list()
   for (it in sub_prj_names) {
     print(it)
@@ -74,8 +80,8 @@ gather_indicators <- function(ssp) {
 
   #################################### SDG6 ####################################
   ## List all RData files and gather in one list
-  sub_prj_names <- c(list.files('/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG6-Water/indiv_results', pattern = paste0('wscarIndex_',ssp)))
-  base_path <- '/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG6-Water/indiv_results'
+  sub_prj_names <- c(list.files(file.path(root, 'SDG6-Water', 'indiv_results'), pattern = paste0('wscarIndex_',ssp)))
+  base_path <- file.path(root, 'SDG6-Water', 'indiv_results')
   fin.list <- list()
   for (it in sub_prj_names) {
     print(it)
@@ -90,10 +96,11 @@ gather_indicators <- function(ssp) {
 
   #################################### SDG15 ####################################
   ## List all RData files and gather in one list
-  sub_csv_names <- c(list.files('gcam_sdg/output/SDG15-Land/results/PSL-results', 
+  sub_csv_names <- c(list.files('gcam_sdg/output/SDG15-Land/results/PSL-results',
                       paste0(".*", "pareto", ".*", ssp, ".*\\.csv$"), full.names = TRUE))
   sub_csv_names <- sub_csv_names[!grepl("base", sub_csv_names)]
   # Read each non-empty CSV file into a list of dataframes
+  empty_files <- c()
   fin.list <- lapply(sub_csv_names, function(file) {
     # Check if the file is empty before reading
     if (file.info(file)$size > 0) {
@@ -107,7 +114,7 @@ gather_indicators <- function(ssp) {
   # Remove NULL entries from the list (corresponding to empty files)
   fin.list <- fin.list[!sapply(fin.list, is.null)]
   ## Gather and save
-  dat_fin <- bind_rows(fin.list) %>% 
+  dat_fin <- dplyr::bind_rows(fin.list) %>%
     dplyr::select(value = final_PSL, scenario) %>%
     dplyr::mutate(Units = 'PSL',
                   account = 'PSL')
@@ -116,8 +123,8 @@ gather_indicators <- function(ssp) {
 
   #################################### SDG0 ####################################
   ## List all RData files and gather in one list
-  sub_prj_names <- c(list.files('/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG0-POP/indiv_results', pattern = paste0('pop_',ssp)))
-  base_path <- '/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output/SDG0-POP/indiv_results'
+  sub_prj_names <- c(list.files(file.path(root, 'SDG0-POP', 'indiv_results'), pattern = paste0('pop_',ssp)))
+  base_path <- file.path(root, 'SDG0-POP', 'indiv_results')
   fin.list <- list()
   for (it in sub_prj_names) {
     print(it)
@@ -132,9 +139,16 @@ gather_indicators <- function(ssp) {
 
 }
 
+#' gather_indicators_ref
+#'
+#' Gather the REF (baseline) scenario's individual SDG indicator files into
+#' one combined RData/csv file per SDG, mirroring gather_indicators() for the
+#' non-SSP baseline run.
+#' @return invisibly writes one combined RData/csv pair per SDG
+#' @export
 gather_indicators_ref <- function() {
   #################################### REF ####################################
-  base_path <- '/scratch/bc3lc/GCAM_v7p1_plus/gcam_sdg/output'
+  base_path <- file.path(gcam_sdg_base_path(), 'gcam_sdg', 'output')
 
   tag = 'SDG1-GDP/indiv_results'
   dat_fin <- read.csv(file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('sdgstudy_base')))[1]))
@@ -165,7 +179,7 @@ gather_indicators_ref <- function() {
 
   tag = 'SDG15-Land/results/PSL-results'
   file_list <- file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('base', ".*", "jan", ".*\\.csv$"))))
-  dat_fin <- bind_rows(lapply(file_list, read.csv)) %>% 
+  dat_fin <- dplyr::bind_rows(lapply(file_list, read.csv)) %>%
     dplyr::select(value = final_PSL, scenario) %>%
     dplyr::mutate(Units = 'PSL',
                   account = 'PSL')
@@ -173,7 +187,7 @@ gather_indicators_ref <- function() {
   write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG15-Land/', paste0('SDG15-Land_','REF','.csv')), row.names = F)
 
   tag = 'SDG0-POP/indiv_results'
-  dat_fin <- read.csv(file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('pop_sdgstudy_base')))[1])) 
+  dat_fin <- read.csv(file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('pop_sdgstudy_base')))[1]))
   save(dat_fin, file = file.path('gcam_sdg/output/SDG0-POP/', paste0('SDG0-POP_','REF','.RData')))
   write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG0-POP/', paste0('SDG0-POP_','REF','.csv')), row.names = F)
 }
