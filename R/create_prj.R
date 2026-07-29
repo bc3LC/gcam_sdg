@@ -13,7 +13,7 @@
 #' @export
 create_prj <- function(db_name, base_path, desired_scen = NULL, prj_name = NULL) {
   db_path <- file.path(base_path,'output')
-  query_path <- system.file("extdata", package = "gcam_sdg")
+  query_path <- system.file("extdata", package = "gcamsdg")
   
   ##############################################################################
   ##############################################################################
@@ -136,7 +136,7 @@ create_prj <- function(db_name, base_path, desired_scen = NULL, prj_name = NULL)
 #' @return dataframe with the specified query information
 data_query = function(type, db_path, db_name, prj_name, scenarios) {
   dt = data.frame()
-  xml <- xml2::read_xml(system.file("extdata", "queries_rfasst_nonCO2.xml", package = "gcam_sdg"))
+  xml <- xml2::read_xml(system.file("extdata", "queries_rfasst_nonCO2.xml", package = "gcamsdg"))
   qq <- xml2::xml_find_first(xml, paste0("//*[@title='", type, "']"))
   
   full_nonCO2_emissions_list = c('BC','BC_AWB','C2F6','CF4','CH4','CH4_AGR','CH4_AWB','CO','CO_AWB','H2',

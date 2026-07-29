@@ -1,4 +1,4 @@
-Package: gcam_sdg
+Package: gcamsdg
 Title: gcam_sdg
 Version: 0.1.0
 Authors@R: person("Jon", "Sampedro", email = "jon.sampedro@bc3research.org", role = c("aut", "cre"),

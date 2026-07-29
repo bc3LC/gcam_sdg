@@ -43,7 +43,7 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
   scen_name <- listScenarios(prj)
   
   # Upload basin mapping
-  basin.id <- read.csv(system.file("extdata", "basin_to_country_mapping.csv", package = "gcam_sdg"))
+  basin.id <- read.csv(system.file("extdata", "basin_to_country_mapping.csv", package = "gcamsdg"))
   print("Creating Demeter inputs from GCAM land allocation query")
   
   # Format GCAM land use outputs to fit as Demeter inputs 
@@ -173,7 +173,7 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
   # Extract surfaces by land use type from the netCDF files
   year <- c('2020','2050')
   output_year <- data.frame(year)
-  areas_land_types <- read.csv(system.file("extdata", "Coordinates.csv", package = "gcam_sdg"))
+  areas_land_types <- read.csv(system.file("extdata", "Coordinates.csv", package = "gcamsdg"))
 
   # List and rename files 
   folders <- list.dirs(dir_demeter, full.names = FALSE, recursive = FALSE)
@@ -197,7 +197,7 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
   
   # Load & Process Ecoregions shp ---- 
   print("Loading and processing Ecoregion data")
-  ecoregions_shp <- st_read(system.file("extdata", "Ecoregions_shp", "wwf_terr_ecos.shp", package = "gcam_sdg"))
+  ecoregions_shp <- st_read(system.file("extdata", "Ecoregions_shp", "wwf_terr_ecos.shp", package = "gcamsdg"))
   # Check the geometries
   ecoregions_valid <- st_is_valid(ecoregions_shp)
   # Identify invalid geometries
@@ -209,9 +209,9 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
     dplyr::select(all_of(c("OBJECTID", "eco_code")))
   length(unique(ecoregions_id$OBJECTID))
   # Read file with the Ecoregion names from Chaudhary and Brookes (2018)
-  ecoregions_ID <- read.csv(system.file("extdata", "Ecoregion_ID.csv", package = "gcam_sdg"))
+  ecoregions_ID <- read.csv(system.file("extdata", "Ecoregion_ID.csv", package = "gcamsdg"))
   # Create the final CSV that will receive the PSL results (one line per scenario)
-  final_csv = read.csv(system.file("extdata", "PSL_template.csv", package = "gcam_sdg"))
+  final_csv = read.csv(system.file("extdata", "PSL_template.csv", package = "gcamsdg"))
   
   print("Starting to create the dataframes from NetCDF files")
   # Create the NetCDF Files ----
@@ -219,7 +219,7 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
     for (j in 1:2) {
       
       # Initialize the receiving dataframe 
-      merge_df = read.csv(system.file("extdata", "lonlat_coord.csv", package = "gcam_sdg"))
+      merge_df = read.csv(system.file("extdata", "lonlat_coord.csv", package = "gcamsdg"))
       merge_df = merge_df[,2:3]
       
       # Create path components 
@@ -339,7 +339,7 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
         )
     
     # Estimate the final PSL number with CF file 
-    CF = read.csv(system.file("extdata", "CF.csv", package = "gcam_sdg"))
+    CF = read.csv(system.file("extdata", "CF.csv", package = "gcamsdg"))
     
     final = merge(joined_shp_extended, CF, by = c("ECOREGION_CODE")) %>% 
       mutate(

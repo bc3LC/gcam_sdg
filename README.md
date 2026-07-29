@@ -35,9 +35,12 @@ gcam_sdg/
 
 ## Installation
 
+The repository/GitHub project is named `gcam_sdg`, but R package names can't contain underscores, so the installed package itself is called `gcamsdg`:
+
 ```r
 # install.packages("devtools")
 devtools::install_github("bc3LC/gcam_sdg")
+library(gcamsdg)
 ```
 
 Or, when working directly on a local clone:

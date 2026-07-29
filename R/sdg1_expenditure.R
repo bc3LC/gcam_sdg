@@ -73,7 +73,7 @@ get_sdg1_expenditure <- function(prj, prj_name, ssp, prj_base, final_db_year = 2
   
   
   # ENERGY EXPENDITURE
-  energy_mult <- read.csv(system.file("extdata", "energy_mult.csv", package = "gcam_sdg"),
+  energy_mult <- read.csv(system.file("extdata", "energy_mult.csv", package = "gcamsdg"),
                           skip = 2) %>%
     dplyr::select(-year)
 
@@ -143,7 +143,7 @@ get_sdg1_expenditure <- function(prj, prj_name, ssp, prj_base, final_db_year = 2
 
   
   # FOOD EXPENDITURE
-  food_exp <- read.csv(system.file("extdata", "food_exp.csv", package = "gcam_sdg"),
+  food_exp <- read.csv(system.file("extdata", "food_exp.csv", package = "gcamsdg"),
                           skip = 2) %>%
     dplyr::select(-year)
 
