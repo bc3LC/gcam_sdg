@@ -57,23 +57,7 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
     filter(year <= final_db_year,
            year >= first_model_year) %>%
     mutate(diff = GDPpc_thous - GDPpc_thous_base) %>%
-    group_by(scenario, unit) %>%
-    summarise(diff = mean(diff)) %>%
-    ungroup() %>%
-    filter(scenario != baseline_scen) %>%
-    mutate(sdg = "Economy",
-           sector = if_else(grepl("afolu", scenario), "afolu", "a"),
-           sector = if_else(grepl("ind", scenario), "ind", sector),
-           sector = if_else(grepl("bld", scenario), "bld", sector),
-           sector = if_else(grepl("trn", scenario), "trn", sector),
-           sector = if_else(grepl("sup", scenario), "sup", sector)) %>%
-    mutate(scenario = sub("_([^_]*)$", "_split_\\1", scenario)) %>%
-    tidyr::separate(scenario, into = c("adj", "scenario"), sep = "_split_", extra = "merge", fill = "right") %>%
-    select(-adj) %>%
-    rename(Gt_CO2_reduction = scenario) %>%
-    pivot_wider(names_from = sector,
-                values_from = diff) %>%
-    arrange(as.numeric(Gt_CO2_reduction))
+    postprocess_sdg_diff("Economy", baseline_scen, match = "exact")
 
   # SDG 2: GDP
   poverty_output <- get_sdg2_food_basket_bill(prj, saveOutput = F)
@@ -86,24 +70,9 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
     mutate(units = "perc_GDP") %>%
     filter(year <= final_db_year,
            year >= first_model_year) %>%
-    mutate(diff = expenditure_percent_GDP - expenditure_percent_GDP_base) %>%
-    group_by(scenario, unit = units) %>%
-    summarise(diff = mean(diff)) %>%
-    ungroup() %>%
-    filter(scenario != baseline_scen) %>%
-    mutate(sdg = "Poverty",
-           sector = if_else(grepl("afolu", scenario), "afolu", "a"),
-           sector = if_else(grepl("ind", scenario), "ind", sector),
-           sector = if_else(grepl("bld", scenario), "bld", sector),
-           sector = if_else(grepl("trn", scenario), "trn", sector),
-           sector = if_else(grepl("sup", scenario), "sup", sector)) %>%
-    mutate(scenario = sub("_([^_]*)$", "_split_\\1", scenario)) %>%
-    tidyr::separate(scenario, into = c("adj", "scenario"), sep = "_split_", extra = "merge", fill = "right") %>%
-    select(-adj) %>%
-    rename(Gt_CO2_reduction = scenario) %>%
-    pivot_wider(names_from = sector,
-                values_from = diff) %>%
-    arrange(as.numeric(Gt_CO2_reduction))
+    mutate(diff = expenditure_percent_GDP - expenditure_percent_GDP_base,
+           unit = units) %>%
+    postprocess_sdg_diff("Poverty", baseline_scen, match = "exact")
 
   # SDG 3: Health
   # health <- get_sdg3_health(prj, final_db_year = 2050)
@@ -130,25 +99,9 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
     left_join_error_no_match(health_base, by = "year") %>%
     filter(year <= final_db_year,
            year >= first_model_year) %>%
-    mutate(diff = mort - mort_base) %>%
-    mutate(unit = "Mortalities") %>%
-    group_by(scenario, unit) %>%
-    summarise(diff = mean(diff)) %>%
-    ungroup() %>%
-    filter(scenario != baseline_scen) %>%
-    mutate(sdg = "Health",
-           sector = if_else(grepl("afolu", scenario), "afolu", "a"),
-           sector = if_else(grepl("ind", scenario), "ind", sector),
-           sector = if_else(grepl("bld", scenario), "bld", sector),
-           sector = if_else(grepl("trn", scenario), "trn", sector),
-           sector = if_else(grepl("sup", scenario), "sup", sector)) %>%
-    mutate(scenario = sub("_([^_]*)$", "_split_\\1", scenario)) %>%
-    tidyr::separate(scenario, into = c("adj", "scenario"), sep = "_split_", extra = "merge", fill = "right") %>%
-    select(-adj) %>%
-    rename(Gt_CO2_reduction = scenario) %>%
-    pivot_wider(names_from = sector,
-                values_from = diff) %>%
-    arrange(as.numeric(Gt_CO2_reduction))
+    mutate(diff = mort - mort_base,
+           unit = "Mortalities") %>%
+    postprocess_sdg_diff("Health", baseline_scen, match = "exact")
 
   # SDG 6
   water_output <- get_sdg6_water_scarcity(prj,saveOutput = F)
@@ -163,24 +116,9 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
     mutate(Units = "Index") %>%
     filter(year <= final_db_year,
            year >= first_model_year) %>%
-    mutate(diff = index - index_base) %>%
-    group_by(scenario, unit = Units) %>%
-    summarise(diff = mean(diff)) %>%
-    ungroup() %>%
-    filter(scenario != baseline_scen) %>%
-    mutate(sdg = "Water",
-           sector = if_else(grepl("afolu", scenario), "afolu", "a"),
-           sector = if_else(grepl("ind", scenario), "ind", sector),
-           sector = if_else(grepl("bld", scenario), "bld", sector),
-           sector = if_else(grepl("trn", scenario), "trn", sector),
-           sector = if_else(grepl("sup", scenario), "sup", sector)) %>%
-    mutate(scenario = sub("_([^_]*)$", "_split_\\1", scenario)) %>%
-    tidyr::separate(scenario, into = c("adj", "scenario"), sep = "_split_", extra = "merge", fill = "right") %>%
-    select(-adj) %>%
-    rename(Gt_CO2_reduction = scenario) %>%
-    pivot_wider(names_from = sector,
-                values_from = diff) %>%
-    arrange(as.numeric(Gt_CO2_reduction))
+    mutate(diff = index - index_base,
+           unit = Units) %>%
+    postprocess_sdg_diff("Water", baseline_scen, match = "exact")
 
   
   # SDG 15: Land
@@ -196,25 +134,9 @@ run <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
                                filter(year <= final_db_year,
                                       year >= first_model_year), by = join_by(year)) %>%
     mutate(Units = "%") %>%
-    mutate(diff = percent_unmanaged - percent_unmanaged_base) %>%
-    group_by(scenario, unit = Units) %>%
-    summarise(diff = mean(diff)) %>%
-    ungroup() %>%
-    filter(scenario != baseline_scen) %>%
-    mutate(sdg = "Land",
-           sector = if_else(grepl("afolu", scenario), "afolu", "a"),
-           sector = if_else(grepl("ind", scenario), "ind", sector),
-           sector = if_else(grepl("bld", scenario), "bld", sector),
-           sector = if_else(grepl("trn", scenario), "trn", sector),
-           sector = if_else(grepl("sup", scenario), "sup", sector),
-           sector = if_else(grepl("dac", scenario), "dac", sector)) %>%
-    mutate(scenario = sub("_([^_]*)$", "_split_\\1", scenario)) %>%
-    tidyr::separate(scenario, into = c("adj", "scenario"), sep = "_split_", extra = "merge", fill = "right") %>%
-    select(-adj) %>%
-    rename(Gt_CO2_reduction = scenario) %>%
-    pivot_wider(names_from = sector,
-                values_from = diff) %>%
-    arrange(as.numeric(Gt_CO2_reduction))
+    mutate(diff = percent_unmanaged - percent_unmanaged_base,
+           unit = Units) %>%
+    postprocess_sdg_diff("Land", baseline_scen, match = "exact")
 
 
 
