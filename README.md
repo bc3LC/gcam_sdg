@@ -1,13 +1,77 @@
 # gcam_sdg
 This repository includes different scripts to automatically compute and report Sustainable development Goals (SDG)-related indicators for alternative GCAM scenarios.
 
+The tool covers two steps: (1) extracting results for a set of scenarios from a GCAM database (via [rgcam](https://github.com/JGCRI/rgcam)), and (2) post-processing those results, combined with external datasets and tools (e.g. [rfasst](https://github.com/bc3LC/rfasst) for health, [Demeter](https://github.com/JGCRI/demeter) for land) into SDG-specific indicators.
+
+## Repository structure
+
+`gcam_sdg` is a real R package (not a folder of scripts to `source()`), following the same conventions as the sibling BC3 tools [gcamreport](https://github.com/bc3LC/gcamreport) and [rfasst](https://github.com/bc3LC/rfasst):
+
+```
+gcam_sdg/
+├── R/                    # package functions
+│   ├── config.R            - gcam_sdg_base_path() / gcam_sdg_conda_env() path helpers
+│   ├── load_prj.R          - load a saved rgcam project
+│   ├── create_prj.R        - create an rgcam project from a GCAM database + queries
+│   ├── sdg0_population.R   - SDG 0: population (basis for other indicators)
+│   ├── sdg1_gdp.R          - SDG 1: GDP per capita
+│   ├── sdg1_expenditure.R  - SDG 1: food + energy expenditure share of income
+│   ├── sdg2_food_basket_bill.R  - SDG 2: food basket bill
+│   ├── sdg3_health.R       - SDG 3: air-pollution-attributable mortality
+│   ├── sdg6_water_scarcity.R    - SDG 6: water scarcity index
+│   ├── sdg15_land_indicator.R   - SDG 15: potential species loss (PSL)
+│   ├── postprocess_sdg_diff.R   - shared diff-vs-baseline post-processing
+│   ├── run.R, run_SDG_indicators.R, gather_SDGs.R  - orchestration across all SDGs/scenarios
+├── inst/extdata/         # bundled queries (queries_*.xml) and lookup data (CF.csv, Ecoregions_shp/, etc.)
+└── scripts/
+    └── hpc/              # standalone Rscript launchers for the BC3 "DIPC" cluster
+        ├── dipc_run_create_prj.R
+        ├── dipc_run_indicators.R
+        ├── dipc_run_SDG15_Land.R
+        ├── dipc_run_SDG3_Health.R
+        ├── dipc_gather_prj.R
+        └── dipc_gather_SDG15_Land.R
+```
+
+## Installation
+
+```r
+# install.packages("devtools")
+devtools::install_github("bc3LC/gcam_sdg")
+```
+
+Or, when working directly on a local clone:
+
+```r
+devtools::load_all("path/to/gcam_sdg")
+```
+
+## Running locally vs. on the BC3 cluster
+
+Several functions (SDG3's mortality lookup in `run.R`, and SDG15's Demeter run in `sdg15_land_indicator.R`) need to know where the GCAM run directory (`output/`, `prj_files/`) lives, and — for SDG15 — which conda environment has Demeter installed. This is resolved by `gcam_sdg_base_path()` / `gcam_sdg_conda_env()` ([R/config.R](R/config.R)), in this order:
+
+1. `options(gcam_sdg.base_path = ...)` / `options(gcam_sdg.conda_env = ...)`
+2. the `GCAM_SDG_BASE_PATH` / `GCAM_SDG_CONDA_ENV` environment variables
+3. the BC3 "DIPC" cluster defaults (`/scratch/bc3lc/GCAM_v7p1_plus` and `/scratch/bc3lc/conda-env/dem-env-3`)
+
+**On the BC3 cluster:** the [scripts/hpc/](scripts/hpc/) launchers work out of the box with no configuration — they default to the same cluster paths.
+
+**Anywhere else (a different machine, another cluster, or a local run):** set the base path before loading the package or running a `scripts/hpc/` launcher, e.g.:
+
+```r
+Sys.setenv(GCAM_SDG_BASE_PATH = "/path/to/your/GCAM_run_dir")
+Sys.setenv(GCAM_SDG_CONDA_ENV = "/path/to/your/demeter-conda-env")  # only needed for SDG15
+```
+
+or, if invoking a `scripts/hpc/*.R` file directly via `Rscript`, set the same as OS environment variables beforehand (e.g. `export GCAM_SDG_BASE_PATH=/path/to/dir` on Linux, `$env:GCAM_SDG_BASE_PATH = "..."` in PowerShell) — the scripts read them via `Sys.getenv()` before doing anything else.
+
 ## SDG description
 
 ### SDG 1: Poverty
 
 Source: https://www.un.org/sustainabledevelopment/poverty/
 
-Script: [SDG1_Expenditure.R](https://https://github.com/bc3LC/gcam_sdg/blob/main/R/SDG1_Expenditure.R)
+Script: [sdg1_expenditure.R](R/sdg1_expenditure.R)
 
 To measure the impact of mitigation pathways on poverty, we focus on household expenditures on residential (home) energy and food relative to their average income, reflecting the relative pressure on households to meet their basic needs. 
 
@@ -32,7 +96,7 @@ Where $E reflects home energy expenditure, $F food expenditure, $I income, r the
 ### SDG 2: Zero hunger
 Source: https://www.un.org/sustainabledevelopment/hunger/
 
-Script: [SDG2_Food_Basket_Bill.R](https://github.com/bc3lc/gcam_sdg/blob/main/R/SDG2_Food_Basket_Bill.R)
+Script: [sdg2_food_basket_bill.R](R/sdg2_food_basket_bill.R)
 
 Description: 
 
@@ -45,7 +109,7 @@ $$\sum_{fc\ in\ foodNonStapleItems} ConsumptionPC_{fn,t,r} \cdot PricePCNonStapl
 ### SDG 3: Ensure healthy lives and promote well-being for all at all ages
 Source: https://www.un.org/sustainabledevelopment/health/
 
-Script: [SDG3_Health.R](https://github.com/bc3lc/gcam_sdg/blob/main/R/SDG3_Health.R)
+Script: [sdg3_health.R](R/sdg3_health.R)
 
 Description: 
 
@@ -78,7 +142,7 @@ References SDG3
 ## SDG 6: Clean Water and Sanitation
 Source: https://www.un.org/sustainabledevelopment/water-and-sanitation/
 
-Script: [SDG6_Water_Scarcity.R](https://github.com/bc3lc/gcam_sdg/blob/main/R/SDG6_Water_Scarcity.R)
+Script: [sdg6_water_scarcity.R](R/sdg6_water_scarcity.R)
 
 Description: 
 
@@ -105,7 +169,7 @@ References SDG6
 ## SDG15: Life of Land
 Source: https://www.un.org/sustainabledevelopment/biodiversity/
 
-Script: [SDG15 Life on Land.R](https://github.com/bc3lc/gcam_sdg/blob/main/R/SDG15_Land_Indicator.R)
+Script: [sdg15_land_indicator.R](R/sdg15_land_indicator.R)
 
 Description: 
 
