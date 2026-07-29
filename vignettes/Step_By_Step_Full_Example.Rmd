@@ -1,0 +1,147 @@
+---
+title: "Step-by-step full example"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Step_By_Step_Full_Example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+`gcamsdg` (repository name `gcam_sdg`) covers two steps: 1) extracting results for a set of scenarios from a GCAM database, and 2) post-processing those results, combined with external datasets and tools, into SDG-specific indicators. This tutorial walks through both steps for a single database ([Example 1](#example1)), the quick one-off comparison entry point ([Example 2](#example2)), and the full multi-scenario/multi-SSP batch pipeline used on the BC3 cluster ([Example 3](#example3)).
+
+To see a formal description of any function mentioned here, look at the [reference index](https://bc3lc.github.io/gcam_sdg/reference/index.html).
+
+<span style="color:white">newline</span>
+
+
+## Example 1: compute individual SDG indicators from a GCAM database {#example1}
+
+1) Install the package (see the [README](https://github.com/bc3LC/gcam_sdg#installation)):
+
+``` r
+devtools::install_github("bc3LC/gcam_sdg")
+```
+
+2) Load it. If you are using RStudio or working directly on a clone, run
+
+``` r
+devtools::load_all()
+```
+
+and otherwise
+
+``` r
+library(gcamsdg)
+```
+
+3) Point the package at your GCAM run directory. This directory should contain an `output/` folder with your `.basex` GCAM database, and (once created) a `prj_files/` folder for the generated rgcam project. By default this resolves to the BC3 "DIPC" cluster path; override it for a local run:
+
+``` r
+options(gcam_sdg.base_path = "/path/to/your/GCAM_run_dir")
+```
+
+See the README's ["Running locally vs. on the BC3 cluster"](https://github.com/bc3LC/gcam_sdg#running-locally-vs-on-the-bc3-cluster) section for the full list of overrides (including the `GCAM_SDG_BASE_PATH` environment variable, and the Demeter conda env override needed for SDG 15 below).
+
+4) Create (or, if it already exists, load) an rgcam project from your database. `create_prj()` reads all the SDG queries bundled with the package (`inst/extdata/queries_*.xml`), adds a couple of heavier queries that need special handling (detailed land allocation, nonCO2 emissions), and saves the result under `prj_files/`:
+
+``` r
+create_prj(
+  db_name    = "my_gcam_database",   # extension is added automatically if missing
+  base_path  = getOption("gcam_sdg.base_path"),
+  desired_scen = c("scen1", "scen2") # omit to use every scenario in the database
+)
+```
+
+`create_prj()` doesn't return the project directly - it saves it to `prj_files/<db_name>.dat` (or the name you pass via `prj_name`) and prints the available queries/scenarios. Load it with `load_prj()`:
+
+``` r
+prj <- load_prj(prj_path = "prj_files", prj_name = "my_gcam_database.dat")
+```
+
+5) Compute each SDG indicator on the loaded project. Every `get_sdgX_*()` function takes the project and the project's file name (used to tag the saved output files), and returns the computed indicator as a data frame while also writing individual results under `gcam_sdg/output/<SDG>/`:
+
+``` r
+pop      <- get_sdg0_pop(prj, "my_gcam_database.dat")
+gdp      <- get_sdg1_gdp(prj, "my_gcam_database.dat")
+poverty  <- get_sdg2_food_basket_bill(prj, "my_gcam_database.dat")
+health   <- get_sdg3_health(prj, "my_gcam_database.dat", final_db_year = 2050)
+water    <- get_sdg6_water_scarcity(prj, "my_gcam_database.dat")
+```
+
+SDG 1's expenditure indicator needs a couple of extra arguments, since it compares each scenario's income against the baseline (REF) scenario's:
+
+``` r
+prj_base <- load_prj("prj_files", "my_baseline_database.dat")   # the REF/baseline scenario's project
+
+expenditure <- get_sdg1_expenditure(
+  prj, "my_gcam_database.dat",
+  ssp = "SSP2",       # or "base" if prj *is* the baseline
+  prj_base = prj_base,
+  final_db_year = 2050
+)
+```
+
+SDG 15 additionally downscales GCAM land allocation with [Demeter](https://github.com/JGCRI/demeter) via `reticulate`, so it needs a conda environment with Demeter installed (defaults to the BC3 cluster's; override with `options(gcam_sdg.conda_env = ...)` or `GCAM_SDG_CONDA_ENV`):
+
+``` r
+land <- get_sdg15_land_indicator(prj, "my_gcam_database.dat")
+```
+
+6) Check the output: look under `gcam_sdg/output/` and you should see one subfolder per SDG (`SDG0-POP`, `SDG1-GDP`, `SDG1-Expenditure`, `SDG2-Poverty`, `SDG3-Health`, `SDG6-Water`, `SDG15-Land`), each with an `indiv_results/` folder containing the raw csv output for this project.
+
+<span style="color:white">newline</span>
+
+
+## Example 2: quick one-off comparison against a fixed baseline {#example2}
+
+If you just want a single comparison table for one policy database against one baseline scenario (no SSP loop), `run()` wraps steps 4-6 above for you. It expects `baseline_scen` to already be set to the name of the baseline scenario in your calling environment, and a database literally named `database_basexdb_sdgstudy_base.dat` in your working directory:
+
+``` r
+library(gcamsdg)
+options(gcam_sdg.base_path = "/path/to/your/GCAM_run_dir")
+
+baseline_scen <- "SDGstudy_incr_base"
+run()
+```
+
+This computes SDG 1 (Economy), SDG 2 (Poverty), SDG 3 (Health, read from an already-gathered `mort.fin_ALL.csv`), SDG 6 (Water) and SDG 15 (Land) for every non-baseline scenario, averages each diff-vs-baseline over the model years, tags scenarios by policy sector (afolu/ind/bld/trn/dac/sup, inferred from the scenario name), and writes the combined table to `output/sdg_Deliverable.csv`.
+
+<span style="color:white">newline</span>
+
+
+## Example 3: full multi-scenario, multi-SSP batch pipeline {#example3}
+
+This is the pipeline the [scripts/hpc/](https://github.com/bc3LC/gcam_sdg/tree/main/scripts/hpc) launchers automate on the BC3 cluster, useful when you have many mitigation-scenario databases across several SSPs to compare against a REF baseline. It has three stages:
+
+**Stage 1 - compute individual indicators for every scenario database.** `run_indiv()` is exactly [Example 1](#example1)'s step 5, bundled into one call per database:
+
+``` r
+prj_base <- rgcam::loadProject(file.path("prj_files", "database_basexdb_sdgstudy_base.dat"))
+
+for (db in list.files("prj_files", pattern = "database_basexdb_SSP2")) {
+  run_indiv(prj_name = db, prj_base = prj_base, ssp = "SSP2")
+}
+run_indiv(prj_name = "database_basexdb_sdgstudy_base.dat", prj_base = prj_base, ssp = "base")
+```
+
+**Stage 2 - gather each SSP's per-scenario results into one file per SDG.** `gather_indicators()` reads everything `run_indiv()` wrote under `<base_path>/gcam_sdg/output/<SDG>/indiv_results` for a given SSP and combines it; `gather_indicators_ref()` does the same for the baseline:
+
+``` r
+gather_indicators("SSP2")
+gather_indicators_ref()
+```
+
+**Stage 3 - compute the final SSP-vs-REF comparison.** `run_comparisson()` reads the gathered files back in, computes the diff vs. baseline exactly like `run()` does, but keeps every SSP's columns separate (suffixed `_<ssp>`) so they can be merged across SSPs:
+
+``` r
+output <- run_comparisson(ssp = "SSP2", base_path = gcam_sdg_base_path())
+# output is a list: gdp, expenditure, poverty, health, water, land
+```
+
+See [scripts/hpc/dipc_run_indicators.R](https://github.com/bc3LC/gcam_sdg/blob/main/scripts/hpc/dipc_run_indicators.R) for how these three stages are looped across all SSPs and merged into one final `sdg_v4.csv`. To run that script (or any other `scripts/hpc/*.R` launcher) somewhere other than the BC3 cluster, set the base path *before* it runs, since the script needs it to locate the package itself:
+
+``` r
+Sys.setenv(GCAM_SDG_BASE_PATH = "/path/to/your/GCAM_run_dir")
+```
+
+or as an OS environment variable if invoking via `Rscript` directly (e.g. `export GCAM_SDG_BASE_PATH=/path/to/dir` on Linux, `$env:GCAM_SDG_BASE_PATH = "..."` in PowerShell).
