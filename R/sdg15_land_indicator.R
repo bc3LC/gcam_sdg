@@ -1,25 +1,32 @@
 library(dplyr)
 library(tidyr)
 
+#' get_sdg15_land_indicator
+#'
+#' Compute SDG 15 (Life on Land) as the net Potential Species Loss (PSL)
+#' indicator, downscaling GCAM land allocation with Demeter and aggregating
+#' land-use change to the ecoregion level.
 #' @param prj uploaded project file
 #' @param saveOutput save the produced output
 #' @param makeFigures generate and save graphical representation/s of the output
+#' @return data frame with the final PSL by scenario
+#' @export
 get_sdg15_land_indicator <- function(prj, saveOutput = T, makeFigures = F){
 
   print('computing sdg15 - land indicator ...')
-  
+
   # Create the directories if they do not exist:
   if (!dir.exists("gcam_sdg/output")) dir.create("gcam_sdg/output")
   if (!dir.exists("gcam_sdg/output/SDG15-Land")) dir.create("gcam_sdg/output/SDG15-Land")
   if (!dir.exists("gcam_sdg/output/SDG15-Land/figures")) dir.create("gcam_sdg/output/SDG15-Land/figures")
-  
-  # Create outputs folders 
-  if (!dir.create("gcam_sdg/output/SDG15-Land/results")) dir.create("gcam_sdg/output/SDG15-Land/results/")
-  if (!dir.create("gcam_sdg/output/SDG15-Land/results/QGIS-input-files")) dir.create("gcam_sdg/output/SDG15-Land/results/QGIS-input-files")
-  if (!dir.create("gcam_sdg/output/SDG15-Land/results/Processed-Demeter-outputs")) dir.create("gcam_sdg/output/SDG15-Land/results/Processed-Demeter-outputs")
-  if (!dir.create("gcam_sdg/output/SDG15-Land/results/Output-data-by-ecoregion")) dir.create("gcam_sdg/output/SDG15-Land/results/Output-data-by-ecoregion")
-  if (!dir.create("gcam_sdg/output/SDG15-Land/results/PSL-results")) dir.create("gcam_sdg/output/SDG15-Land/results/PSL-results")
-  if (!dir.create("gcam_sdg/output/SDG15-Land/results/PSL-prj-results")) dir.create("gcam_sdg/output/SDG15-Land/results/PSL-prj-results")
+
+  # Create outputs folders
+  if (!dir.exists("gcam_sdg/output/SDG15-Land/results")) dir.create("gcam_sdg/output/SDG15-Land/results/")
+  if (!dir.exists("gcam_sdg/output/SDG15-Land/results/QGIS-input-files")) dir.create("gcam_sdg/output/SDG15-Land/results/QGIS-input-files")
+  if (!dir.exists("gcam_sdg/output/SDG15-Land/results/Processed-Demeter-outputs")) dir.create("gcam_sdg/output/SDG15-Land/results/Processed-Demeter-outputs")
+  if (!dir.exists("gcam_sdg/output/SDG15-Land/results/Output-data-by-ecoregion")) dir.create("gcam_sdg/output/SDG15-Land/results/Output-data-by-ecoregion")
+  if (!dir.exists("gcam_sdg/output/SDG15-Land/results/PSL-results")) dir.create("gcam_sdg/output/SDG15-Land/results/PSL-results")
+  if (!dir.exists("gcam_sdg/output/SDG15-Land/results/PSL-prj-results")) dir.create("gcam_sdg/output/SDG15-Land/results/PSL-prj-results")
   
   # Set the dipc path for the GCAM folder
   dipc_path = "/scratch/bc3lc/GCAM_v7p1_plus/"

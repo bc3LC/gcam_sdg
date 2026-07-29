@@ -1,15 +1,21 @@
 library(dplyr)
 library(tidyr)
 
+#' get_sdg2_food_basket_bill
+#'
+#' Compute SDG 2 (Zero Hunger) as the per-capita food basket bill, expressed
+#' as a percentage of GDP, weighted globally by population.
 #' @param prj uploaded project file
 #' @param saveOutput save the produced output
 #' @param makeFigures generate and save graphical representation/s of the output
+#' @return data frame with the global food basket bill (% GDP) by scenario and year
+#' @export
 get_sdg2_food_basket_bill <- function(prj, saveOutput = T, makeFigures = F){
 
   print('computing sdg2 - food basket bill...')
 
   # Create the directories if they do not exist:
-  if (!dir.exists("ougcam_sdg/outputtput")) dir.create("gcam_sdg/output")
+  if (!dir.exists("gcam_sdg/output")) dir.create("gcam_sdg/output")
   if (!dir.exists("gcam_sdg/output/SDG2-Poverty")) dir.create("gcam_sdg/output/SDG2-Poverty")
   if (!dir.exists("gcam_sdg/output/SDG2-Poverty/indiv_results")) dir.create("gcam_sdg/output/SDG2-Poverty/indiv_results")
   if (!dir.exists("gcam_sdg/output/SDG2-Poverty/figures")) dir.create("gcam_sdg/output/SDG2-Poverty/figures")

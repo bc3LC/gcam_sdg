@@ -1,9 +1,16 @@
 library(dplyr)
 library(tidyr)
 
+#' get_sdg6_water_scarcity
+#'
+#' Compute SDG 6 (Clean Water and Sanitation) as the physical water scarcity
+#' index (withdrawals over renewable water supply) by basin, weighted by the
+#' 2015 baseline withdrawal/supply volume.
 #' @param prj uploaded project file
 #' @param saveOutput save the produced output
 #' @param makeFigures generate and save graphical representation/s of the output
+#' @return data frame with the water scarcity index by scenario, resource and year
+#' @export
 get_sdg6_water_scarcity <- function(prj, saveOutput = T, makeFigures = F){
 
   print('computing sdg6 - water scarcity ...')

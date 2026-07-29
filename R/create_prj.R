@@ -8,6 +8,7 @@
 #' @param desired_scen desired scenarios. If NULL, all the scenarios present in the database will be considered
 #' @param prj_name name of the project. If NULL, it will be the defult option, i.e., the database name. Otherwise specify
 #' @return create the specified project
+#' @export
 create_prj <- function(db_name, desired_scen = NULL, prj_name = NULL) {
   db_path <- file.path(base_path,'output')
   query_path <- system.file("extdata", package = "gcam_sdg")

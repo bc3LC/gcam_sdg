@@ -1,19 +1,24 @@
 library(dplyr)
 library(tidyr)
 
+#' get_sdg1_expenditure
+#'
+#' Compute the food + energy expenditure as a percentage of income by region
+#' and income decile, for SDG 1 (Poverty).
+#'
+#' Energy expenditure: `building service costs` * `building service output by
+#' service`, then rescaled to real-world data via the energy_mult dataset.
+#' Food expenditure: `food demand prices by income group` * `food demand by
+#' income group`, then rescaled via a multiplier computed as the average
+#' regional expenditure vs. real-world data from the food_exp dataset.
+#' World aggregation: decile-regional annual values weighted by population.
+#' The indicator itself considers the 2020-2050 average output.
 #' @param prj uploaded project file
+#' @param ssp SSP tag used to select the matching income scenario (or "base")
 #' @param saveOutput save the produced output
 #' @param makeFigures generate and save graphical representation/s of the output
-#' The idea is to compute the food + energy expenditure as a percentage of the income
-#' by region and group
-#' Energy expenditure: `building service costs` * `building service output by service`, careful units;
-#' then, we multiply the expenditure by the energy_mult data to rescale the values to real-world data
-#' Food expenditure: `food demand prices by income group` * `food demand by income group`, careful units;
-#' then, we compute the multiplier as the average expendityre by region vs the real-word data from food_exp
-#' dataset. Afterwards, we multiply the decile-regional expenditure by the new multipliers to rescale the 
-#' values to real-world data
-#' World aggergation: we aggergate the decile-regional annual values weighted by population. For the indicator,
-#' we consider the 2020-2050 average output
+#' @return data frame with the global population-weighted expenditure share of income by scenario and year
+#' @export
 get_sdg1_expenditure <- function(prj, ssp, saveOutput = T, makeFigures = F){
   
   print('computing sdg1 - expenditure...')
