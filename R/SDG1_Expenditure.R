@@ -64,8 +64,8 @@ get_sdg1_expenditure <- function(prj, ssp, saveOutput = T, makeFigures = F){
   
   
   # ENERGY EXPENDITURE
-  energy_mult <- read.csv(file.path('gcam_sdg','inst','extdata','energy_mult.csv'),
-                          skip = 2) %>% 
+  energy_mult <- read.csv(system.file("extdata", "energy_mult.csv", package = "gcam_sdg"),
+                          skip = 2) %>%
     dplyr::select(-year)
 
   energy_expenditure <- 
@@ -134,8 +134,8 @@ get_sdg1_expenditure <- function(prj, ssp, saveOutput = T, makeFigures = F){
 
   
   # FOOD EXPENDITURE
-  food_exp <- read.csv(file.path('gcam_sdg','inst','extdata','food_exp.csv'),
-                          skip = 2) %>% 
+  food_exp <- read.csv(system.file("extdata", "food_exp.csv", package = "gcam_sdg"),
+                          skip = 2) %>%
     dplyr::select(-year)
 
   food_expenditure <- 
