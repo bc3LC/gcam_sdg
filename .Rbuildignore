@@ -1,0 +1,7 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^scripts$
+^output$
+^prj_files$
+^\.github$
+^README\.md$
