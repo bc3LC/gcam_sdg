@@ -9,7 +9,7 @@ vignette: >
 
 `gcamsdg` covers two steps: 1) extracting results for a set of scenarios from a GCAM database, and 2) post-processing those results, combined with external datasets and tools, into SDG-specific indicators. Both steps happen through a single function, `run()`. This tutorial walks through its main modes: a single database ([Example 1](#example1)), several separate policy-scenario databases diffed against a baseline ([Example 2](#example2)), submitting the same call as a SLURM job on the BC3 cluster ([Example 3](#example3)), pairing it with a standard gcamreport run ([Example 4](#example4)), and generating basic figures ([Example 5](#example5)).
 
-To see the full parameter list, run `?run`, or look at the [reference index](https://bc3lc.github.io/gcamsdg/reference/index.html). [debug.R](https://github.com/bc3LC/gcamsdg/blob/main/debug.R) (gitignored, not part of the installed package) runs every example below against a real database in one script for offline testing - its section numbers match the example numbers here 1:1.
+To see the full parameter list, run `?run`, or look at the [reference index](https://bc3lc.github.io/gcamsdg/reference/index.html). [debug_template.R](https://github.com/bc3LC/gcamsdg/blob/main/debug_template.R) runs every example below against a real database in one script for offline testing - copy it to `debug.R` (gitignored, so your local paths never get committed), fill in the `CONFIG` section, and run. Its section numbers match the example numbers here 1:1.
 
 <span style="color:white">newline</span>
 

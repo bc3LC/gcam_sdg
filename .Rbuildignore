@@ -4,3 +4,5 @@
 ^prj_files$
 ^\.github$
 ^README\.md$
+^debug\.R$
+^debug_template\.R$
