@@ -46,8 +46,12 @@
 #' @param final_db_year last model year to consider
 #' @param saveOutput save each indicator's individual output to disk (under
 #'   `gcamsdg/output/<SDG>/`), same as the underlying `get_sdgX_*()` calls
-#' @param makeFigures generate and save graphical representations of the
-#'   output where the underlying indicator supports it
+#' @param makeFigures generate and save a basic figure for each computed
+#'   indicator (a scenario-colored time series, or a bar chart for
+#'   indicators without a year dimension) under
+#'   `<base_path>/gcamsdg/output/<SDG>/figures/`, plus whatever additional
+#'   figure(s) the underlying indicator itself supports (currently just
+#'   SDG6's more detailed resource-faceted charts)
 #' @param base_path run directory containing `output/`/`prj_files/`.
 #'   Defaults to the BC3 "DIPC" cluster path; pass your own for a local run
 #'   or a different cluster.
@@ -198,6 +202,11 @@ run <- function(prj = NULL, prj_name = NULL, db_path = NULL, db_name = NULL,
   if ("land" %in% sdgs) {
     result$land <- compute_across(function(p, n) get_sdg15_land_indicator(p, n, saveOutput = saveOutput, makeFigures = makeFigures,
                                                                            base_path = base_path, conda_env = conda_env))
+  }
+
+  # ---- optional basic figures (time series / bar charts, one per indicator) ----
+  if (makeFigures) {
+    .make_sdg_figures(result, base_path)
   }
 
   # ---- optional companion gcamreport run, sharing the same project ----

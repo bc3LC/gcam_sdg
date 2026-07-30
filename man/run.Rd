@@ -73,8 +73,12 @@ scenario against. Required when `show_diff = TRUE`.}
 \item{saveOutput}{save each indicator's individual output to disk (under
 `gcamsdg/output/<SDG>/`), same as the underlying `get_sdgX_*()` calls}
 
-\item{makeFigures}{generate and save graphical representations of the
-output where the underlying indicator supports it}
+\item{makeFigures}{generate and save a basic figure for each computed
+indicator (a scenario-colored time series, or a bar chart for
+indicators without a year dimension) under
+`<base_path>/gcamsdg/output/<SDG>/figures/`, plus whatever additional
+figure(s) the underlying indicator itself supports (currently just
+SDG6's more detailed resource-faceted charts)}
 
 \item{base_path}{run directory containing `output/`/`prj_files/`.
 Defaults to the BC3 "DIPC" cluster path; pass your own for a local run
