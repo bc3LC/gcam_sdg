@@ -10,9 +10,15 @@ library(tidyr)
 #' @param prj_name project file name, used to tag the saved output file
 #' @param saveOutput save the produced output
 #' @param makeFigures generate and save graphical representation/s of the output
+#' @param base_path run directory containing the `gcamsdg/` checkout and the
+#'   Demeter model (defaults to the BC3 cluster path)
+#' @param conda_env conda environment with Demeter installed, used by
+#'   reticulate (defaults to the BC3 cluster environment)
 #' @return data frame with the final PSL by scenario
 #' @export
-get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures = F){
+get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures = F,
+                                      base_path = "/scratch/bc3lc/GCAM_v7p1_plus",
+                                      conda_env = "/scratch/bc3lc/conda-env/dem-env-3"){
 
   print('computing sdg15 - land indicator ...')
 
@@ -29,14 +35,11 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
   if (!dir.exists("gcamsdg/output/SDG15-Land/results/PSL-results")) dir.create("gcamsdg/output/SDG15-Land/results/PSL-results")
   if (!dir.exists("gcamsdg/output/SDG15-Land/results/PSL-prj-results")) dir.create("gcamsdg/output/SDG15-Land/results/PSL-prj-results")
   
-  # Set the base path for the GCAM folder (defaults to the BC3 cluster path,
-  # override via options(gcamsdg.base_path = ...) or GCAMSDG_BASE_PATH)
-  dipc_path = paste0(gcamsdg_base_path(), "/")
+  # Set the base path for the GCAM folder
+  dipc_path = paste0(base_path, "/")
 
-  # Set the name of the conda environment read by reticulate (defaults to the
-  # BC3 cluster env, override via options(gcamsdg.conda_env = ...) or
-  # GCAMSDG_CONDA_ENV)
-  use_condaenv(gcamsdg_conda_env(), required=TRUE)
+  # Set the name of the conda environment read by reticulate
+  use_condaenv(conda_env, required=TRUE)
   py_config()
   
   # Create vector of all scenarios in the project
@@ -365,7 +368,7 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
     final_agg = final_agg[,-1]
     
     # write.xlsx(final_agg,paste0(dipc_path,"results/PSL-results/",scenario_name,"_PSL_2020_2050.xlsx"), overwrite = TRUE, rowNames=TRUE, colNames=TRUE)
-    if (saveOutput) write.csv(final_agg, file.path(gcamsdg_base_path(), "gcamsdg", "output", "SDG15-Land", "results", "PSL-results", paste0(scenario_name, "_PSL_2020_2050.csv")), row.names = F)
+    if (saveOutput) write.csv(final_agg, file.path(base_path, "gcamsdg", "output", "SDG15-Land", "results", "PSL-results", paste0(scenario_name, "_PSL_2020_2050.csv")), row.names = F)
     
     print(paste0("PSL dataframe for scenario ", scenario_name, " saved in results"))
     final_csv <- rbind(final_csv, final_agg)
