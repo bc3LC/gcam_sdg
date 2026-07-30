@@ -7,9 +7,9 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-`gcamsdg` covers two steps: 1) extracting results for a set of scenarios from a GCAM database, and 2) post-processing those results, combined with external datasets and tools, into SDG-specific indicators. Both steps happen through a single function, `run()`. This tutorial walks through its main modes: a single database ([Example 1](#example1)), several separate policy-scenario databases diffed against a baseline ([Example 2](#example2)), submitting the same call as a SLURM job on the BC3 cluster ([Example 3](#example3)), and pairing it with a standard gcamreport run ([Example 4](#example4)).
+`gcamsdg` covers two steps: 1) extracting results for a set of scenarios from a GCAM database, and 2) post-processing those results, combined with external datasets and tools, into SDG-specific indicators. Both steps happen through a single function, `run()`. This tutorial walks through its main modes: a single database ([Example 1](#example1)), several separate policy-scenario databases diffed against a baseline ([Example 2](#example2)), submitting the same call as a SLURM job on the BC3 cluster ([Example 3](#example3)), pairing it with a standard gcamreport run ([Example 4](#example4)), and generating basic figures ([Example 5](#example5)).
 
-To see the full parameter list, run `?run`, or look at the [reference index](https://bc3lc.github.io/gcamsdg/reference/index.html).
+To see the full parameter list, run `?run`, or look at the [reference index](https://bc3lc.github.io/gcamsdg/reference/index.html). [debug.R](https://github.com/bc3LC/gcamsdg/blob/main/debug.R) (gitignored, not part of the installed package) runs every example below against a real database in one script for offline testing - its section numbers match the example numbers here 1:1.
 
 <span style="color:white">newline</span>
 
@@ -128,3 +128,22 @@ result$gcamreport  # gcamreport's standardized output
 ```
 
 This requires the `gcamreport` package (`devtools::install_github("bc3LC/gcamreport")`) and, currently, a single database/project (not a vector `db_name`).
+
+<span style="color:white">newline</span>
+
+
+## Example 5: basic figures {#example5}
+
+Set `makeFigures = TRUE` to also generate a basic PNG per computed indicator:
+
+``` r
+result <- run(
+  db_name = "my_gcam_database", base_path = "/path/to/your/GCAM_run_dir",
+  sdgs = c("gdp", "poverty", "water"),
+  makeFigures = TRUE
+)
+```
+
+Each PNG is saved alongside that indicator's other output, under `gcamsdg/output/<SDG>/figures/` (e.g. `.../SDG1-GDP/figures/gdp.png`) - a scenario-colored time series line chart for indicators with a year dimension, or a bar chart by scenario for SDG15's PSL (a single net 2020-2050 value, no year dimension). Regional indicators (population, GDP, health) are aggregated to one global series first - GDP uses an unweighted regional average for this quick chart (a real population-weighted GDP per capita is what `show_diff`'s diff-vs-baseline step computes instead).
+
+This does **not** produce geographic maps (e.g. water scarcity by basin, PSL by ecoregion) - the underlying indicator functions currently aggregate that spatial detail away before returning their result, so real choropleth maps would need a deeper change to what they return, not just a plotting helper.
