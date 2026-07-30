@@ -314,9 +314,15 @@ run <- function(prj = NULL, prj_name = NULL, db_path = NULL, db_name = NULL,
   }
 
   if (!is.null(result$land)) {
-    land_base_value <- result$land$final_PSL[result$land$scenario == base_scen][1]
+    land_base <- result$land %>%
+      dplyr::filter(scenario == base_scen) %>%
+      dplyr::rename(final_PSL_base = final_PSL) %>%
+      dplyr::select(final_PSL_base)
+    if (nrow(land_base) == 0) {
+      stop('show_diff = TRUE: base_scen "', base_scen, '" not found among the "land" results.')
+    }
     out$land <- result$land %>%
-      dplyr::mutate(unit = "PSL", diff = final_PSL - land_base_value) %>%
+      dplyr::mutate(unit = "PSL", diff = final_PSL - land_base$final_PSL_base[1]) %>%
       dplyr::select(scenario, unit, diff) %>%
       postprocess_sdg_diff("Land", base_scen, match = "exact")
   }
