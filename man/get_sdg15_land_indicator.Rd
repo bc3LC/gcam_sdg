@@ -4,7 +4,14 @@
 \alias{get_sdg15_land_indicator}
 \title{get_sdg15_land_indicator}
 \usage{
-get_sdg15_land_indicator(prj, prj_name, saveOutput = T, makeFigures = F)
+get_sdg15_land_indicator(
+  prj,
+  prj_name,
+  saveOutput = T,
+  makeFigures = F,
+  base_path = "/scratch/bc3lc/GCAM_v7p1_plus",
+  conda_env = "/scratch/bc3lc/conda-env/dem-env-3"
+)
 }
 \arguments{
 \item{prj}{uploaded project file}
@@ -14,6 +21,12 @@ get_sdg15_land_indicator(prj, prj_name, saveOutput = T, makeFigures = F)
 \item{saveOutput}{save the produced output}
 
 \item{makeFigures}{generate and save graphical representation/s of the output}
+
+\item{base_path}{run directory containing the `gcamsdg/` checkout and the
+Demeter model (defaults to the BC3 cluster path)}
+
+\item{conda_env}{conda environment with Demeter installed, used by
+reticulate (defaults to the BC3 cluster environment)}
 }
 \value{
 data frame with the final PSL by scenario
