@@ -2,11 +2,11 @@
 
 ## Set the working directory
 ## Defaults to the BC3 "DIPC" cluster paths; override via the
-## GCAM_SDG_BASE_PATH / GCAM_SDG_RLIB_PATH environment variables to run
+## GCAMSDG_BASE_PATH / GCAMSDG_RLIB_PATH environment variables to run
 ## on a different machine.
-base_path <- Sys.getenv("GCAM_SDG_BASE_PATH", unset = "/scratch/bc3lc/GCAM_v7p1_plus")
+base_path <- Sys.getenv("GCAMSDG_BASE_PATH", unset = "/scratch/bc3lc/GCAM_v7p1_plus")
 setwd(base_path)
-.libPaths(c(.libPaths(), Sys.getenv("GCAM_SDG_RLIB_PATH", unset = "/scratch/bc3lc/R-libs/4.1")))
+.libPaths(c(.libPaths(), Sys.getenv("GCAMSDG_RLIB_PATH", unset = "/scratch/bc3lc/R-libs/4.1")))
 
 ## List all prj files
 sub_prj_names <- c(list.files(file.path(base_path, 'prj_files'), pattern = 'database_basexdb_SSP4'))

@@ -28,10 +28,10 @@ get_sdg1_expenditure <- function(prj, prj_name, ssp, prj_base, final_db_year = 2
   print('computing sdg1 - expenditure...')
   
   # Create the directories if they do not exist:
-  if (!dir.exists("gcam_sdg/output")) dir.create("gcam_sdg/output")
-  if (!dir.exists("gcam_sdg/output/SDG1-Expenditure")) dir.create("gcam_sdg/output/SDG1-Expenditure")
-  if (!dir.exists("gcam_sdg/output/SDG1-Expenditure/indiv_results")) dir.create("gcam_sdg/output/SDG1-Expenditure/indiv_results")
-  if (!dir.exists("gcam_sdg/output/SDG1-Expenditure/figures")) dir.create("gcam_sdg/output/SDG1-Expenditure/figures")
+  if (!dir.exists("gcamsdg/output")) dir.create("gcamsdg/output")
+  if (!dir.exists("gcamsdg/output/SDG1-Expenditure")) dir.create("gcamsdg/output/SDG1-Expenditure")
+  if (!dir.exists("gcamsdg/output/SDG1-Expenditure/indiv_results")) dir.create("gcamsdg/output/SDG1-Expenditure/indiv_results")
+  if (!dir.exists("gcamsdg/output/SDG1-Expenditure/figures")) dir.create("gcamsdg/output/SDG1-Expenditure/figures")
   
   # POPULATION WEIGHTS
   population_weights <- 
@@ -46,7 +46,7 @@ get_sdg1_expenditure <- function(prj, prj_name, ssp, prj_base, final_db_year = 2
     dplyr::select(scenario, region, year, wpop)
 
   if (saveOutput) write.csv(population_weights, 
-                        file = file.path('gcam_sdg/output/SDG0-POP/indiv_results',paste0('SDG0_popw_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
+                        file = file.path('gcamsdg/output/SDG0-POP/indiv_results',paste0('SDG0_popw_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
                         row.names = F)
 
   
@@ -137,7 +137,7 @@ get_sdg1_expenditure <- function(prj, prj_name, ssp, prj_base, final_db_year = 2
   }
   
   if (saveOutput) write.csv(energy_expenditure_per, 
-                            file = file.path('gcam_sdg/output/SDG1-Expenditure/indiv_results',paste0('SDG1_energyExpPer_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
+                            file = file.path('gcamsdg/output/SDG1-Expenditure/indiv_results',paste0('SDG1_energyExpPer_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
                             row.names = F)
   
 
@@ -220,7 +220,7 @@ get_sdg1_expenditure <- function(prj, prj_name, ssp, prj_base, final_db_year = 2
   
   
   if (saveOutput) write.csv(food_expenditure_per, 
-                            file = file.path('gcam_sdg/output/SDG1-Expenditure/indiv_results',paste0('SDG1_foodExpPer_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
+                            file = file.path('gcamsdg/output/SDG1-Expenditure/indiv_results',paste0('SDG1_foodExpPer_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
                             row.names = F)
   
   
@@ -234,7 +234,7 @@ get_sdg1_expenditure <- function(prj, prj_name, ssp, prj_base, final_db_year = 2
     
   
   if (saveOutput) write.csv(total_expenditure_per, 
-                            file = file.path('gcam_sdg/output/SDG1-Expenditure/indiv_results',paste0('SDG1_totalExpPer_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
+                            file = file.path('gcamsdg/output/SDG1-Expenditure/indiv_results',paste0('SDG1_totalExpPer_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
                             row.names = F)
 
   # WORLD VALUES
@@ -250,7 +250,7 @@ get_sdg1_expenditure <- function(prj, prj_name, ssp, prj_base, final_db_year = 2
   
 
   if (saveOutput) write.csv(world_total_expenditure, 
-                            file = file.path('gcam_sdg/output/SDG1-Expenditure/indiv_results',paste0('SDG1_totalWorldExpPer_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
+                            file = file.path('gcamsdg/output/SDG1-Expenditure/indiv_results',paste0('SDG1_totalWorldExpPer_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
                             row.names = F)
   
 

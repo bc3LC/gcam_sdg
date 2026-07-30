@@ -16,7 +16,7 @@ library(rfasst)
 #' @param saveOutput save the produced output
 #' @param makeFigures generate and save graphical representation/s of the output
 #' @param final_db_year last model year to consider
-#' @return invisibly writes each SDG's individual output under gcam_sdg/output/
+#' @return invisibly writes each SDG's individual output under gcamsdg/output/
 #' @export
 run_indiv <- function(prj_name, prj_base, ssp = NULL, saveOutput = T, makeFigures = F, final_db_year = 2050){
 

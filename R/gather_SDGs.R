@@ -3,13 +3,13 @@
 #' Gather the per-scenario individual SDG indicator files (written by
 #' run_indiv() across all scenarios of a given SSP) into one combined
 #' RData/csv file per SDG. Reads from
-#' `<gcam_sdg_base_path()>/gcam_sdg/output/<SDG>/...` and writes to
-#' `gcam_sdg/output/<SDG>/` relative to the current working directory.
+#' `<gcamsdg_base_path()>/gcamsdg/output/<SDG>/...` and writes to
+#' `gcamsdg/output/<SDG>/` relative to the current working directory.
 #' @param ssp SSP tag used to select the matching per-scenario files
 #' @return invisibly writes one combined RData/csv pair per SDG
 #' @export
 gather_indicators <- function(ssp) {
-  root <- file.path(gcam_sdg_base_path(), 'gcam_sdg', 'output')
+  root <- file.path(gcamsdg_base_path(), 'gcamsdg', 'output')
 
   #################################### SDG1 ####################################
   ## List all RData files and gather in one list
@@ -24,8 +24,8 @@ gather_indicators <- function(ssp) {
   }
   ## Gather and save
   dat_fin <- dplyr::bind_rows(fin.list)
-  save(dat_fin, file = file.path('gcam_sdg/output/SDG1-GDP/', paste0('SDG1-GDP_',ssp,'.RData')))
-  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG1-GDP/', paste0('SDG1-GDP_',ssp,'.csv')), row.names = F)
+  save(dat_fin, file = file.path('gcamsdg/output/SDG1-GDP/', paste0('SDG1-GDP_',ssp,'.RData')))
+  write.csv(dat_fin, file = file.path('gcamsdg/output/SDG1-GDP/', paste0('SDG1-GDP_',ssp,'.csv')), row.names = F)
 
   #################################### SDG1 ####################################
   ## List all RData files and gather in one list
@@ -43,8 +43,8 @@ gather_indicators <- function(ssp) {
   }
   ## Gather and save
   dat_fin <- dplyr::bind_rows(fin.list)
-  save(dat_fin, file = file.path('gcam_sdg/output/SDG1-Expenditure/', paste0('SDG1-Expenditure_',ssp,'.RData')))
-  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG1-Expenditure/', paste0('SDG1-Expenditure_',ssp,'.csv')), row.names = F)
+  save(dat_fin, file = file.path('gcamsdg/output/SDG1-Expenditure/', paste0('SDG1-Expenditure_',ssp,'.RData')))
+  write.csv(dat_fin, file = file.path('gcamsdg/output/SDG1-Expenditure/', paste0('SDG1-Expenditure_',ssp,'.csv')), row.names = F)
 
   #################################### SDG2 ####################################
   ## List all RData files and gather in one list
@@ -59,8 +59,8 @@ gather_indicators <- function(ssp) {
   }
   ## Gather and save
   dat_fin <- dplyr::bind_rows(fin.list)
-  save(dat_fin, file = file.path('gcam_sdg/output/SDG2-Poverty/', paste0('SDG2-Poverty_',ssp,'.RData')))
-  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG2-Poverty/', paste0('SDG2-Poverty_',ssp,'.csv')), row.names = F)
+  save(dat_fin, file = file.path('gcamsdg/output/SDG2-Poverty/', paste0('SDG2-Poverty_',ssp,'.RData')))
+  write.csv(dat_fin, file = file.path('gcamsdg/output/SDG2-Poverty/', paste0('SDG2-Poverty_',ssp,'.csv')), row.names = F)
 
   #################################### SDG3 ####################################
   ## List all RData files and gather in one list
@@ -75,8 +75,8 @@ gather_indicators <- function(ssp) {
   }
   ## Gather and save
   dat_fin <- dplyr::bind_rows(fin.list)
-  save(dat_fin, file = file.path('gcam_sdg/output/SDG3-Health/', paste0('SDG3-mort_',ssp,'.RData')))
-  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG3-Health/', paste0('SDG3-mort_',ssp,'.csv')), row.names = F)
+  save(dat_fin, file = file.path('gcamsdg/output/SDG3-Health/', paste0('SDG3-mort_',ssp,'.RData')))
+  write.csv(dat_fin, file = file.path('gcamsdg/output/SDG3-Health/', paste0('SDG3-mort_',ssp,'.csv')), row.names = F)
 
   #################################### SDG6 ####################################
   ## List all RData files and gather in one list
@@ -91,12 +91,12 @@ gather_indicators <- function(ssp) {
   }
   ## Gather and save
   dat_fin <- dplyr::bind_rows(fin.list)
-  save(dat_fin, file = file.path('gcam_sdg/output/SDG6-Water/', paste0('SDG6-Water_',ssp,'.RData')))
-  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG6-Water/', paste0('SDG6-Water_',ssp,'.csv')), row.names = F)
+  save(dat_fin, file = file.path('gcamsdg/output/SDG6-Water/', paste0('SDG6-Water_',ssp,'.RData')))
+  write.csv(dat_fin, file = file.path('gcamsdg/output/SDG6-Water/', paste0('SDG6-Water_',ssp,'.csv')), row.names = F)
 
   #################################### SDG15 ####################################
   ## List all RData files and gather in one list
-  sub_csv_names <- c(list.files('gcam_sdg/output/SDG15-Land/results/PSL-results',
+  sub_csv_names <- c(list.files('gcamsdg/output/SDG15-Land/results/PSL-results',
                       paste0(".*", "pareto", ".*", ssp, ".*\\.csv$"), full.names = TRUE))
   sub_csv_names <- sub_csv_names[!grepl("base", sub_csv_names)]
   # Read each non-empty CSV file into a list of dataframes
@@ -118,8 +118,8 @@ gather_indicators <- function(ssp) {
     dplyr::select(value = final_PSL, scenario) %>%
     dplyr::mutate(Units = 'PSL',
                   account = 'PSL')
-  save(dat_fin, file = file.path('gcam_sdg/output/SDG15-Land/', paste0('SDG15-PSL_',ssp,'.RData')))
-  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG15-Land/', paste0('SDG15-PSL_',ssp,'.csv')), row.names = F)
+  save(dat_fin, file = file.path('gcamsdg/output/SDG15-Land/', paste0('SDG15-PSL_',ssp,'.RData')))
+  write.csv(dat_fin, file = file.path('gcamsdg/output/SDG15-Land/', paste0('SDG15-PSL_',ssp,'.csv')), row.names = F)
 
   #################################### SDG0 ####################################
   ## List all RData files and gather in one list
@@ -134,8 +134,8 @@ gather_indicators <- function(ssp) {
   }
   ## Gather and save
   dat_fin <- dplyr::bind_rows(fin.list)
-  save(dat_fin, file = file.path('gcam_sdg/output/SDG0-POP/', paste0('SDG0-POP_',ssp,'.RData')))
-  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG0-POP/', paste0('SDG0-POP_',ssp,'.csv')), row.names = F)
+  save(dat_fin, file = file.path('gcamsdg/output/SDG0-POP/', paste0('SDG0-POP_',ssp,'.RData')))
+  write.csv(dat_fin, file = file.path('gcamsdg/output/SDG0-POP/', paste0('SDG0-POP_',ssp,'.csv')), row.names = F)
 
 }
 
@@ -148,34 +148,34 @@ gather_indicators <- function(ssp) {
 #' @export
 gather_indicators_ref <- function() {
   #################################### REF ####################################
-  base_path <- file.path(gcam_sdg_base_path(), 'gcam_sdg', 'output')
+  base_path <- file.path(gcamsdg_base_path(), 'gcamsdg', 'output')
 
   tag = 'SDG1-GDP/indiv_results'
   dat_fin <- read.csv(file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('sdgstudy_base')))[1]))
-  save(dat_fin, file = file.path('gcam_sdg/output/SDG1-GDP/', paste0('SDG1-GDP_','REF','.RData')))
-  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG1-GDP/', paste0('SDG1-GDP_','REF','.csv')), row.names = F)
+  save(dat_fin, file = file.path('gcamsdg/output/SDG1-GDP/', paste0('SDG1-GDP_','REF','.RData')))
+  write.csv(dat_fin, file = file.path('gcamsdg/output/SDG1-GDP/', paste0('SDG1-GDP_','REF','.csv')), row.names = F)
 
   tag = 'SDG1-Expenditure/indiv_results'
   dat_fin <- read.csv(file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('totalWorldExpPer_sdgstudy_base')))[1])) %>%
            dplyr::select(scenario, year, total_expenditure_per_world) %>%
            dplyr::distinct()
-  save(dat_fin, file = file.path('gcam_sdg/output/SDG1-Expenditure/', paste0('SDG1-Expenditure_','REF','.RData')))
-  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG1-Expenditure/', paste0('SDG1-Expenditure_','REF','.csv')), row.names = F)
+  save(dat_fin, file = file.path('gcamsdg/output/SDG1-Expenditure/', paste0('SDG1-Expenditure_','REF','.RData')))
+  write.csv(dat_fin, file = file.path('gcamsdg/output/SDG1-Expenditure/', paste0('SDG1-Expenditure_','REF','.csv')), row.names = F)
 
   tag = 'SDG2-Poverty/indiv_results'
   dat_fin <- read.csv(file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('fbbPerGlobal_sdgstudy_base')))[1]))
-  save(dat_fin, file = file.path('gcam_sdg/output/SDG2-Poverty/', paste0('SDG2-Poverty_','REF','.RData')))
-  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG2-Poverty/', paste0('SDG2-Poverty_','REF','.csv')), row.names = F)
+  save(dat_fin, file = file.path('gcamsdg/output/SDG2-Poverty/', paste0('SDG2-Poverty_','REF','.RData')))
+  write.csv(dat_fin, file = file.path('gcamsdg/output/SDG2-Poverty/', paste0('SDG2-Poverty_','REF','.csv')), row.names = F)
 
   tag = 'SDG3-Health/mort.fin'
   dat_fin <- read.csv(file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('sdgstudy_base')))[1]))
-  save(dat_fin, file = file.path('gcam_sdg/output/SDG3-Health/', paste0('SDG3-Health_','REF','.RData')))
-  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG3-Health/', paste0('SDG3-Health_','REF','.csv')), row.names = F)
+  save(dat_fin, file = file.path('gcamsdg/output/SDG3-Health/', paste0('SDG3-Health_','REF','.RData')))
+  write.csv(dat_fin, file = file.path('gcamsdg/output/SDG3-Health/', paste0('SDG3-Health_','REF','.csv')), row.names = F)
 
   tag = 'SDG6-Water/indiv_results'
   dat_fin <- read.csv(file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('wscarIndex_sdgstudy_base')))[1]))
-  save(dat_fin, file = file.path('gcam_sdg/output/SDG6-Water/', paste0('SDG6-Water_','REF','.RData')))
-  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG6-Water/', paste0('SDG6-Water_','REF','.csv')), row.names = F)
+  save(dat_fin, file = file.path('gcamsdg/output/SDG6-Water/', paste0('SDG6-Water_','REF','.RData')))
+  write.csv(dat_fin, file = file.path('gcamsdg/output/SDG6-Water/', paste0('SDG6-Water_','REF','.csv')), row.names = F)
 
   tag = 'SDG15-Land/results/PSL-results'
   file_list <- file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('base', ".*", "jan", ".*\\.csv$"))))
@@ -183,11 +183,11 @@ gather_indicators_ref <- function() {
     dplyr::select(value = final_PSL, scenario) %>%
     dplyr::mutate(Units = 'PSL',
                   account = 'PSL')
-  save(dat_fin, file = file.path('gcam_sdg/output/SDG15-Land/', paste0('SDG15-Land_','REF','.RData')))
-  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG15-Land/', paste0('SDG15-Land_','REF','.csv')), row.names = F)
+  save(dat_fin, file = file.path('gcamsdg/output/SDG15-Land/', paste0('SDG15-Land_','REF','.RData')))
+  write.csv(dat_fin, file = file.path('gcamsdg/output/SDG15-Land/', paste0('SDG15-Land_','REF','.csv')), row.names = F)
 
   tag = 'SDG0-POP/indiv_results'
   dat_fin <- read.csv(file.path(base_path, tag, c(list.files(file.path(base_path, tag), pattern = paste0('pop_sdgstudy_base')))[1]))
-  save(dat_fin, file = file.path('gcam_sdg/output/SDG0-POP/', paste0('SDG0-POP_','REF','.RData')))
-  write.csv(dat_fin, file = file.path('gcam_sdg/output/SDG0-POP/', paste0('SDG0-POP_','REF','.csv')), row.names = F)
+  save(dat_fin, file = file.path('gcamsdg/output/SDG0-POP/', paste0('SDG0-POP_','REF','.RData')))
+  write.csv(dat_fin, file = file.path('gcamsdg/output/SDG0-POP/', paste0('SDG0-POP_','REF','.csv')), row.names = F)
 }

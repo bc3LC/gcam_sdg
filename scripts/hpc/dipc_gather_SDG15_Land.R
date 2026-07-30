@@ -2,11 +2,11 @@
 
 ## Set the working directory
 ## Defaults to the BC3 "DIPC" cluster paths; override via the
-## GCAM_SDG_BASE_PATH / GCAM_SDG_RLIB_PATH environment variables to run
+## GCAMSDG_BASE_PATH / GCAMSDG_RLIB_PATH environment variables to run
 ## on a different machine.
-root_path <- Sys.getenv("GCAM_SDG_BASE_PATH", unset = "/scratch/bc3lc/GCAM_v7p1_plus")
+root_path <- Sys.getenv("GCAMSDG_BASE_PATH", unset = "/scratch/bc3lc/GCAM_v7p1_plus")
 setwd(root_path)
-.libPaths(c(.libPaths(), Sys.getenv("GCAM_SDG_RLIB_PATH", unset = "/scratch/bc3lc/R-libs/4.1")))
+.libPaths(c(.libPaths(), Sys.getenv("GCAMSDG_RLIB_PATH", unset = "/scratch/bc3lc/R-libs/4.1")))
 
 ## List all RData files and gather in one list
 base_path <- file.path(root_path, 'output', 'SDG15-Land', 'results', 'PSL-prj-results')

@@ -7,18 +7,18 @@
 args <- commandArgs(trailingOnly=TRUE)
 print(args)
 
-## Set the working directory and load the gcam_sdg package
+## Set the working directory and load the gcamsdg package
 ## Defaults to the BC3 "DIPC" cluster paths; override via the
-## GCAM_SDG_BASE_PATH / GCAM_SDG_RLIB_PATH environment variables to run
+## GCAMSDG_BASE_PATH / GCAMSDG_RLIB_PATH environment variables to run
 ## on a different machine.
-base_path <- Sys.getenv("GCAM_SDG_BASE_PATH", unset = "/scratch/bc3lc/GCAM_v7p1_plus")
+base_path <- Sys.getenv("GCAMSDG_BASE_PATH", unset = "/scratch/bc3lc/GCAM_v7p1_plus")
 setwd(base_path)
-.libPaths(c(.libPaths(), Sys.getenv("GCAM_SDG_RLIB_PATH", unset = "/scratch/bc3lc/R-libs/4.1")))
+.libPaths(c(.libPaths(), Sys.getenv("GCAMSDG_RLIB_PATH", unset = "/scratch/bc3lc/R-libs/4.1")))
 
 library(dplyr)
 library(tidyr)
 library(rgcam)
-devtools::load_all(file.path(base_path, "gcam_sdg"))
+devtools::load_all(file.path(base_path, "gcamsdg"))
 
 ## Extract the db name
 db_name <- args[1]

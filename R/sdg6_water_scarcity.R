@@ -17,10 +17,10 @@ get_sdg6_water_scarcity <- function(prj, prj_name, saveOutput = T, makeFigures =
   print('computing sdg6 - water scarcity ...')
 
   # Create the directories if they do not exist:
-  if (!dir.exists("gcam_sdg/output")) dir.create("gcam_sdg/output")
-  if (!dir.exists("gcam_sdg/output/SDG6-Water")) dir.create("gcam_sdg/output/SDG6-Water")
-  if (!dir.exists("gcam_sdg/output/SDG6-Water/indiv_results")) dir.create("gcam_sdg/output/SDG6-Water/indiv_results")
-  if (!dir.exists("gcam_sdg/output/SDG6-Water/figures")) dir.create("gcam_sdg/output/SDG6-Water/figures")
+  if (!dir.exists("gcamsdg/output")) dir.create("gcamsdg/output")
+  if (!dir.exists("gcamsdg/output/SDG6-Water")) dir.create("gcamsdg/output/SDG6-Water")
+  if (!dir.exists("gcamsdg/output/SDG6-Water/indiv_results")) dir.create("gcamsdg/output/SDG6-Water/indiv_results")
+  if (!dir.exists("gcamsdg/output/SDG6-Water/figures")) dir.create("gcamsdg/output/SDG6-Water/figures")
 
   # Get Water Supply Data
   water_supply = rgcam::getQuery(prj, "Basin level available runoff") %>%
@@ -83,10 +83,10 @@ get_sdg6_water_scarcity <- function(prj, prj_name, saveOutput = T, makeFigures =
     filter(resource == "runoff")
 
   if (saveOutput) write.csv(water_scarcity_index, 
-                            file = file.path('gcam_sdg/output/SDG6-Water/indiv_results',paste0('SDG6_wscarIndex_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")), 
+                            file = file.path('gcamsdg/output/SDG6-Water/indiv_results',paste0('SDG6_wscarIndex_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")), 
                             row.names = F)
   if (saveOutput) write.csv(water_scarcity_index_runoff_wd, 
-                            file = file.path('gcam_sdg/output/SDG6-Water/indiv_results',paste0('SDG6_wscarIndexRunOff_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")), 
+                            file = file.path('gcamsdg/output/SDG6-Water/indiv_results',paste0('SDG6_wscarIndexRunOff_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")), 
                             row.names = F)
 
   if (makeFigures) {
@@ -105,7 +105,7 @@ get_sdg6_water_scarcity <- function(prj, prj_name, saveOutput = T, makeFigures =
             legend.title = element_text(size = 40),
             title = element_text(size = 40))
     # print(pl_water_scarcity_index_sup)
-    ggsave(pl_water_scarcity_index_sup, file = file.path('gcam_sdg/output/SDG6-Water/figures', paste0('sdg6_water_scarcity_index_sup.png')),
+    ggsave(pl_water_scarcity_index_sup, file = file.path('gcamsdg/output/SDG6-Water/figures', paste0('sdg6_water_scarcity_index_sup.png')),
            width = 1000, height = 1000, units = 'mm', limitsize = FALSE)
 
     pl_water_scarcity_index_wd = ggplot(data = water_scarcity_index) +
@@ -123,7 +123,7 @@ get_sdg6_water_scarcity <- function(prj, prj_name, saveOutput = T, makeFigures =
             legend.title = element_text(size = 40),
             title = element_text(size = 40))
     # print(pl_water_scarcity_index_wd)
-    ggsave(pl_water_scarcity_index_wd, file = file.path('gcam_sdg/output/SDG6-Water/figures', paste0('sdg6_water_scarcity_index_wd.png')),
+    ggsave(pl_water_scarcity_index_wd, file = file.path('gcamsdg/output/SDG6-Water/figures', paste0('sdg6_water_scarcity_index_wd.png')),
            width = 1000, height = 1000, units = 'mm', limitsize = FALSE)
   }
 

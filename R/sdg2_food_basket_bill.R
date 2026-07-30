@@ -16,10 +16,10 @@ get_sdg2_food_basket_bill <- function(prj, prj_name, saveOutput = T, makeFigures
   print('computing sdg2 - food basket bill...')
 
   # Create the directories if they do not exist:
-  if (!dir.exists("gcam_sdg/output")) dir.create("gcam_sdg/output")
-  if (!dir.exists("gcam_sdg/output/SDG2-Poverty")) dir.create("gcam_sdg/output/SDG2-Poverty")
-  if (!dir.exists("gcam_sdg/output/SDG2-Poverty/indiv_results")) dir.create("gcam_sdg/output/SDG2-Poverty/indiv_results")
-  if (!dir.exists("gcam_sdg/output/SDG2-Poverty/figures")) dir.create("gcam_sdg/output/SDG2-Poverty/figures")
+  if (!dir.exists("gcamsdg/output")) dir.create("gcamsdg/output")
+  if (!dir.exists("gcamsdg/output/SDG2-Poverty")) dir.create("gcamsdg/output/SDG2-Poverty")
+  if (!dir.exists("gcamsdg/output/SDG2-Poverty/indiv_results")) dir.create("gcamsdg/output/SDG2-Poverty/indiv_results")
+  if (!dir.exists("gcamsdg/output/SDG2-Poverty/figures")) dir.create("gcamsdg/output/SDG2-Poverty/figures")
 
   # Perform computations
   food_subsector <- read.csv(system.file("extdata", "food_subsector.csv", package = "gcamsdg"))
@@ -79,7 +79,7 @@ get_sdg2_food_basket_bill <- function(prj, prj_name, saveOutput = T, makeFigures
     mutate(units = 'percentage')
 
   if (saveOutput) write.csv(food_basket_bill_percent_GDP, 
-                            file = file.path('gcam_sdg/output/SDG2-Poverty/indiv_results',paste0('SDG2_fbbPerGDP_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
+                            file = file.path('gcamsdg/output/SDG2-Poverty/indiv_results',paste0('SDG2_fbbPerGDP_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")),
                             row.names = F)
 
   # compute GLOBAL food basket expenditure
@@ -102,7 +102,7 @@ get_sdg2_food_basket_bill <- function(prj, prj_name, saveOutput = T, makeFigures
     ungroup()
 
   if (saveOutput) write.csv(food_basket_bill_percent_GDP_global, 
-                            file = file.path('gcam_sdg/output/SDG2-Poverty/indiv_results',paste0('SDG2_fbbPerGlobal_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")), 
+                            file = file.path('gcamsdg/output/SDG2-Poverty/indiv_results',paste0('SDG2_fbbPerGlobal_',gsub("\\.dat$", "", gsub("^database_basexdb_", "", prj_name)), ".csv")), 
                             row.names = F)
 
   return(food_basket_bill_percent_GDP_global)

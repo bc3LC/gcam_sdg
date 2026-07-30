@@ -17,26 +17,26 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
   print('computing sdg15 - land indicator ...')
 
   # Create the directories if they do not exist:
-  if (!dir.exists("gcam_sdg/output")) dir.create("gcam_sdg/output")
-  if (!dir.exists("gcam_sdg/output/SDG15-Land")) dir.create("gcam_sdg/output/SDG15-Land")
-  if (!dir.exists("gcam_sdg/output/SDG15-Land/figures")) dir.create("gcam_sdg/output/SDG15-Land/figures")
+  if (!dir.exists("gcamsdg/output")) dir.create("gcamsdg/output")
+  if (!dir.exists("gcamsdg/output/SDG15-Land")) dir.create("gcamsdg/output/SDG15-Land")
+  if (!dir.exists("gcamsdg/output/SDG15-Land/figures")) dir.create("gcamsdg/output/SDG15-Land/figures")
 
   # Create outputs folders
-  if (!dir.exists("gcam_sdg/output/SDG15-Land/results")) dir.create("gcam_sdg/output/SDG15-Land/results/")
-  if (!dir.exists("gcam_sdg/output/SDG15-Land/results/QGIS-input-files")) dir.create("gcam_sdg/output/SDG15-Land/results/QGIS-input-files")
-  if (!dir.exists("gcam_sdg/output/SDG15-Land/results/Processed-Demeter-outputs")) dir.create("gcam_sdg/output/SDG15-Land/results/Processed-Demeter-outputs")
-  if (!dir.exists("gcam_sdg/output/SDG15-Land/results/Output-data-by-ecoregion")) dir.create("gcam_sdg/output/SDG15-Land/results/Output-data-by-ecoregion")
-  if (!dir.exists("gcam_sdg/output/SDG15-Land/results/PSL-results")) dir.create("gcam_sdg/output/SDG15-Land/results/PSL-results")
-  if (!dir.exists("gcam_sdg/output/SDG15-Land/results/PSL-prj-results")) dir.create("gcam_sdg/output/SDG15-Land/results/PSL-prj-results")
+  if (!dir.exists("gcamsdg/output/SDG15-Land/results")) dir.create("gcamsdg/output/SDG15-Land/results/")
+  if (!dir.exists("gcamsdg/output/SDG15-Land/results/QGIS-input-files")) dir.create("gcamsdg/output/SDG15-Land/results/QGIS-input-files")
+  if (!dir.exists("gcamsdg/output/SDG15-Land/results/Processed-Demeter-outputs")) dir.create("gcamsdg/output/SDG15-Land/results/Processed-Demeter-outputs")
+  if (!dir.exists("gcamsdg/output/SDG15-Land/results/Output-data-by-ecoregion")) dir.create("gcamsdg/output/SDG15-Land/results/Output-data-by-ecoregion")
+  if (!dir.exists("gcamsdg/output/SDG15-Land/results/PSL-results")) dir.create("gcamsdg/output/SDG15-Land/results/PSL-results")
+  if (!dir.exists("gcamsdg/output/SDG15-Land/results/PSL-prj-results")) dir.create("gcamsdg/output/SDG15-Land/results/PSL-prj-results")
   
   # Set the base path for the GCAM folder (defaults to the BC3 cluster path,
-  # override via options(gcam_sdg.base_path = ...) or GCAM_SDG_BASE_PATH)
-  dipc_path = paste0(gcam_sdg_base_path(), "/")
+  # override via options(gcamsdg.base_path = ...) or GCAMSDG_BASE_PATH)
+  dipc_path = paste0(gcamsdg_base_path(), "/")
 
   # Set the name of the conda environment read by reticulate (defaults to the
-  # BC3 cluster env, override via options(gcam_sdg.conda_env = ...) or
-  # GCAM_SDG_CONDA_ENV)
-  use_condaenv(gcam_sdg_conda_env(), required=TRUE)
+  # BC3 cluster env, override via options(gcamsdg.conda_env = ...) or
+  # GCAMSDG_CONDA_ENV)
+  use_condaenv(gcamsdg_conda_env(), required=TRUE)
   py_config()
   
   # Create vector of all scenarios in the project
@@ -62,7 +62,7 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
   scenario_names <- unique(det.LU$scenario)
   
   # Create path for specific scenario
-  demeter_root <- file.path(dipc_path, "gcam_sdg", "demeter-2.0", "demeter", "GCAM_demeter_protection_scenario")
+  demeter_root <- file.path(dipc_path, "gcamsdg", "demeter-2.0", "demeter", "GCAM_demeter_protection_scenario")
   dir_demeter <- file.path(demeter_root, "outputs")
   
   # Loop to create one file per scenario in "input/projected" demeter folder and configuration files
@@ -365,7 +365,7 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
     final_agg = final_agg[,-1]
     
     # write.xlsx(final_agg,paste0(dipc_path,"results/PSL-results/",scenario_name,"_PSL_2020_2050.xlsx"), overwrite = TRUE, rowNames=TRUE, colNames=TRUE)
-    if (saveOutput) write.csv(final_agg, file.path(gcam_sdg_base_path(), "gcam_sdg", "output", "SDG15-Land", "results", "PSL-results", paste0(scenario_name, "_PSL_2020_2050.csv")), row.names = F)
+    if (saveOutput) write.csv(final_agg, file.path(gcamsdg_base_path(), "gcamsdg", "output", "SDG15-Land", "results", "PSL-results", paste0(scenario_name, "_PSL_2020_2050.csv")), row.names = F)
     
     print(paste0("PSL dataframe for scenario ", scenario_name, " saved in results"))
     final_csv <- rbind(final_csv, final_agg)
@@ -373,7 +373,7 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
   }
   
   # Write CSV
-  if (saveOutput) write.csv(final_csv, file = file.path('gcam_sdg/output/SDG15-Land/results/PSL-prj-results/',paste0('PSL_',gsub("\\.dat$", "", prj_name, ".csv"))), row.names = F)
+  if (saveOutput) write.csv(final_csv, file = file.path('gcamsdg/output/SDG15-Land/results/PSL-prj-results/',paste0('PSL_',gsub("\\.dat$", "", prj_name, ".csv"))), row.names = F)
   print(paste0("PSL dataframe for all scenarios of the ", prj_name, " saved in results"))
   return(invisible(final_csv))
   

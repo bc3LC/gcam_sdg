@@ -1,15 +1,15 @@
-## Set the working directory and load the gcam_sdg package
+## Set the working directory and load the gcamsdg package
 ## Defaults to the BC3 "DIPC" cluster paths; override via the
-## GCAM_SDG_BASE_PATH / GCAM_SDG_RLIB_PATH environment variables to run
+## GCAMSDG_BASE_PATH / GCAMSDG_RLIB_PATH environment variables to run
 ## on a different machine.
-base_path <- Sys.getenv("GCAM_SDG_BASE_PATH", unset = "/scratch/bc3lc/GCAM_v7p1_plus")
+base_path <- Sys.getenv("GCAMSDG_BASE_PATH", unset = "/scratch/bc3lc/GCAM_v7p1_plus")
 setwd(base_path)
-.libPaths(c(.libPaths(), Sys.getenv("GCAM_SDG_RLIB_PATH", unset = "/scratch/bc3lc/R-libs/4.1")))
+.libPaths(c(.libPaths(), Sys.getenv("GCAMSDG_RLIB_PATH", unset = "/scratch/bc3lc/R-libs/4.1")))
 
 library(dplyr)
 library(tidyr)
 library(rgcam)
-devtools::load_all(file.path(base_path, "gcam_sdg"))
+devtools::load_all(file.path(base_path, "gcamsdg"))
 
 ssps <- c('SSP1','SSP2','SSP3','SSP4','SSP5')
 
@@ -81,4 +81,4 @@ trn_cols <- grep("^trn", names(sdg), value = TRUE)
 final_col_order <- c(manual_cols, afolu_cols, bld_cols, dac_cols, ind_cols, sup_cols, trn_cols)
 sdg_ordered <- sdg[, final_col_order]
 
-write.csv(sdg_ordered, file = file.path("gcam_sdg/output","sdg_v4.csv"), row.names = F)
+write.csv(sdg_ordered, file = file.path("gcamsdg/output","sdg_v4.csv"), row.names = F)

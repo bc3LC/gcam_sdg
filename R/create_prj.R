@@ -6,7 +6,7 @@
 #' Function to create a GCAM project provided a database and a queries file
 #' @param db_name name of the database. It will The extension will be automatically added if not present
 #' @param base_path run directory containing the `output/` (GCAM databases)
-#'   and `prj_files/` folders. See gcam_sdg_base_path().
+#'   and `prj_files/` folders. See gcamsdg_base_path().
 #' @param desired_scen desired scenarios. If NULL, all the scenarios present in the database will be considered
 #' @param prj_name name of the project. If NULL, it will be the defult option, i.e., the database name. Otherwise specify
 #' @return create the specified project
