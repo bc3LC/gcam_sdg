@@ -7,3 +7,4 @@ output/*
 prj_files/
 *.Rcheck/
 *.tar.gz
+debug.R

@@ -26,7 +26,8 @@ Imports:
     sf,
     sp,
     raster,
-    shapefiles
+    shapefiles,
+    grid
 Suggests:
     devtools,
     roxygen2,

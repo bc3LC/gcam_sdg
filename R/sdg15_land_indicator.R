@@ -39,8 +39,8 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
   dipc_path = paste0(base_path, "/")
 
   # Set the name of the conda environment read by reticulate
-  use_condaenv(conda_env, required=TRUE)
-  py_config()
+  reticulate::use_condaenv(conda_env, required=TRUE)
+  reticulate::py_config()
   
   # Create vector of all scenarios in the project
   scen_name <- listScenarios(prj)
@@ -200,13 +200,13 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
   
   # Load & Process Ecoregions shp ---- 
   print("Loading and processing Ecoregion data")
-  ecoregions_shp <- st_read(system.file("extdata", "Ecoregions_shp", "wwf_terr_ecos.shp", package = "gcamsdg"))
+  ecoregions_shp <- sf::st_read(system.file("extdata", "Ecoregions_shp", "wwf_terr_ecos.shp", package = "gcamsdg"))
   # Check the geometries
-  ecoregions_valid <- st_is_valid(ecoregions_shp)
+  ecoregions_valid <- sf::st_is_valid(ecoregions_shp)
   # Identify invalid geometries
   invalid_ecoregions <- ecoregions_shp[!ecoregions_valid, ]
-  # Fix the geometries 
-  ecoregions_shp = st_make_valid(ecoregions_shp)
+  # Fix the geometries
+  ecoregions_shp = sf::st_make_valid(ecoregions_shp)
   # Simplify ecoregions
   ecoregions_id <- ecoregions_shp %>% 
     dplyr::select(all_of(c("OBJECTID", "eco_code")))
@@ -231,26 +231,26 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
       NetCDFfiles_path <- file.path(dir_demeter,scenario_name,netcdffolder,nc_file)
       print(NetCDFfiles_path)
       # Read the nc file from Demeter outputs
-      ncin <- nc_open(NetCDFfiles_path)
-      
-      # Set the list of variables 
+      ncin <- ncdf4::nc_open(NetCDFfiles_path)
+
+      # Set the list of variables
       variables = names(ncin$var)
-      
+
       # Get longitude and latitude
-      lon <- ncvar_get(ncin,"longitude")
+      lon <- ncdf4::ncvar_get(ncin,"longitude")
       nlon <- dim(lon)
       head(lon)
-      lat <- ncvar_get(ncin,"latitude")
+      lat <- ncdf4::ncvar_get(ncin,"latitude")
       nlat <- dim(lat)
       head(lat)
       lonlat <- as.matrix(expand.grid(lon, lat))
       dim(lonlat)
-      
+
       # Function to create dataframes from the variables of the nc file
       for (i in 1:length(variables)) {
-        
+
         # i = 5
-        landuse_df <- na.omit(data.frame(cbind(lonlat, as.vector(ncvar_get(ncin, ncin$var[[i]])))))
+        landuse_df <- na.omit(data.frame(cbind(lonlat, as.vector(ncdf4::ncvar_get(ncin, ncin$var[[i]])))))
         names(landuse_df) <- c("lon", "lat", paste(ncin$var[[i]]$longname)) # instead of landuse, the longname of the variable i
         # assign(paste(ncin$var[[i]]$longname, "df", sep="_"), landuse_df)
         merge_df = merge(merge_df, landuse_df)
@@ -281,31 +281,31 @@ get_sdg15_land_indicator <- function(prj, prj_name, saveOutput = T, makeFigures 
     # Geography parameters 
     areas_land_types <- merge_df %>% rename ("longitude"="lon") %>% rename ("latitude"="lat")
     areas_land_types_shp <- areas_land_types
-    coordinates(areas_land_types_shp)=~longitude+latitude
-    proj4string(areas_land_types_shp)<- CRS("+proj=longlat +datum=WGS84")
-    areas_land_types_shp = st_as_sf(areas_land_types_shp)
-    
+    sp::coordinates(areas_land_types_shp)=~longitude+latitude
+    sp::proj4string(areas_land_types_shp)<- sp::CRS("+proj=longlat +datum=WGS84")
+    areas_land_types_shp = sf::st_as_sf(areas_land_types_shp)
+
     # Unique geometries
-    unique(st_geometry_type(areas_land_types_shp$geometry))
-    
+    unique(sf::st_geometry_type(areas_land_types_shp$geometry))
+
     # Check the classes
     class(areas_land_types_shp)
-    crs(areas_land_types_shp)
-    areas_land_types_shp = st_transform(areas_land_types_shp, crs=4326)
-    
+    raster::crs(areas_land_types_shp)
+    areas_land_types_shp = sf::st_transform(areas_land_types_shp, crs=4326)
+
     # Check the geometries
-    areas_land_types_valid <- st_is_valid(areas_land_types_shp)
-    
+    areas_land_types_valid <- sf::st_is_valid(areas_land_types_shp)
+
     # Identify invalid geometries
     invalid_areas_land_types <- areas_land_types_shp[!areas_land_types_valid, ]
-    
-    # Join attributes by location 
-    joined_shp_id = st_join(areas_land_types_shp, ecoregions_id, join = st_intersects) # way too long, need to simply both with index 
-    
+
+    # Join attributes by location
+    joined_shp_id = sf::st_join(areas_land_types_shp, ecoregions_id, join = sf::st_intersects) # way too long, need to simply both with index
+
     # Aggregate per land use, dropping geometry
     joined_shp_agg <- joined_shp_id %>%
-      st_drop_geometry() %>%
-      group_by(OBJECTID) %>% 
+      sf::st_drop_geometry() %>%
+      group_by(OBJECTID) %>%
       summarise(
                 forest.x = sum(forest.x),
                 pasture.x = sum(pasture.x),

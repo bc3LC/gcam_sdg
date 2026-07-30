@@ -73,7 +73,7 @@ create_prj <- function(db_name, base_path, desired_scen = NULL, prj_name = NULL,
   
   # prj name checks and/or definition
   if (!is.null(prj_name)) {
-    assert_that(substr(prj_name, nchar(prj_name) - 3, nchar(prj_name)) == ".dat", msg = 'In `load_prj` function: The specified project name does not contain the extension (.dat)')
+    assertthat::assert_that(substr(prj_name, nchar(prj_name) - 3, nchar(prj_name)) == ".dat", msg = 'In `load_prj` function: The specified project name does not contain the extension (.dat)')
   } else {
     prj_name = paste0(db_name, '.dat')
   }
@@ -82,7 +82,7 @@ create_prj <- function(db_name, base_path, desired_scen = NULL, prj_name = NULL,
   conn <- rgcam::localDBConn(db_path, db_name)
   available_scen <- rgcam::listScenariosInDB(conn)$name
   if (!is.null(desired_scen)) {
-    assert_that(all(desired_scen %in% available_scen))
+    assertthat::assert_that(all(desired_scen %in% available_scen))
   } else {
     desired_scen <- available_scen
   }
