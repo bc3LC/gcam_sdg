@@ -65,6 +65,12 @@ run(db_name = "database_basexdb_myscenario", run_gcamreport = TRUE, GCAM_version
 
 See `?run` for the full parameter list, and the [step-by-step vignette](vignettes/Step_By_Step_Full_Example.Rmd) for worked examples of each mode.
 
+## Outputs
+
+`run()` returns a named list in memory, one data frame per computed SDG (`result$gdp`, `result$water`, ...), plus `$gcamreport` when requested. The same data is also written to disk under `<base_path>/gcamsdg/output/<SDG folder>/`, one subfolder per indicator (`SDG0-POP`, `SDG1-GDP`, `SDG1-Expenditure`, `SDG2-Poverty`, `SDG3-Health`, `SDG6-Water`, `SDG15-Land`), each with an `indiv_results/` (or similar) folder holding the raw CSV.
+
+Set `makeFigures = TRUE` to also get a basic PNG per computed indicator under each folder's `figures/` subfolder: a scenario-colored time series for indicators with a year dimension, or a bar chart by scenario for SDG15's PSL (a single net 2020-2050 value, no year dimension). Regional indicators (population, GDP, health) are aggregated to one global series first. This does **not** produce geographic maps (e.g. water scarcity by basin, PSL by ecoregion) - the underlying indicator functions currently aggregate that spatial detail away before returning their result, so real choropleth maps would need a separate, deeper change.
+
 ## Running locally vs. on the BC3 cluster
 
 `run()` takes `base_path` (run directory containing `output/`/`prj_files/`) and `conda_env` (Demeter's conda environment, only needed for `sdgs` including `"land"`) as plain arguments, defaulting to the BC3 "DIPC" cluster's values. For a local run or a different cluster, just pass your own:
