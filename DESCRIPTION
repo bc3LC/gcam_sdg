@@ -1,11 +1,11 @@
 Package: gcamsdg
-Title: gcam_sdg
+Title: GCAM SDG Indicators Toolkit
 Version: 0.1.0
 Authors@R: person("Jon", "Sampedro", email = "jon.sampedro@bc3research.org", role = c("aut", "cre"),
 		   comment = c(ORCID = "0000-0002-2277-1530"))
 Description: R tool to extract GCAM scenario results and post-process them into Sustainable Development Goals (SDG)-related indicators.
-URL: https://github.com/bc3LC/gcam_sdg
-BugReports: https://github.com/bc3LC/gcam_sdg/issues
+URL: https://github.com/bc3LC/gcamsdg
+BugReports: https://github.com/bc3LC/gcamsdg/issues
 Depends: R (>= 4.1.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
