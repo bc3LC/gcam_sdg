@@ -32,11 +32,13 @@ Suggests:
     roxygen2,
     knitr,
     rmarkdown,
+    gcamreport,
     testthat (>= 3.0.0)
 Remotes:
     github::JGCRI/rgcam,
     github::JGCRI/gcamdata,
-    github::bc3LC/rfasst
+    github::bc3LC/rfasst,
+    github::bc3LC/gcamreport
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0
