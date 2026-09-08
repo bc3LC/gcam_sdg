@@ -18,9 +18,6 @@ Imports:
     xml2,
     assertthat,
     ggplot2,
-    rgcam,
-    gcamdata,
-    rfasst,
     reticulate,
     ncdf4,
     sf,
@@ -33,7 +30,6 @@ Suggests:
     roxygen2,
     knitr,
     rmarkdown,
-    gcamreport,
     testthat (>= 3.0.0)
 Remotes:
     github::JGCRI/rgcam,
