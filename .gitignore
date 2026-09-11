@@ -4,3 +4,7 @@
 .Ruserdata
 output/*
 /data_PSL
+prj_files/
+*.Rcheck/
+*.tar.gz
+debug.R

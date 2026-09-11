@@ -4,20 +4,29 @@ library(rgcam)
 library(gcamdata)
 library(rfasst)
 
+#' get_sdg3_health
+#'
+#' Compute SDG 3 (Health) as premature mortalities attributable to long-term
+#' exposure to PM2.5 and O3, using rfasst, downscaled to country level by
+#' population share and re-aggregated to GCAM region.
 #' @param prj uploaded project file
+#' @param prj_name project file name, used to tag the saved output file
 #' @param saveOutput save the produced output
 #' @param makeFigures generate and save graphical representation/s of the output
-get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year = 2050){
+#' @param final_db_year last model year to consider
+#' @return data frame with mortalities by scenario, GCAM region and year
+#' @export
+get_sdg3_health <- function(prj, prj_name, saveOutput = T, makeFigures = F, final_db_year = 2050){
   
   print('computing sdg3 - health impacts......')
   
   # Create the directories if they do not exist:
-  if (!dir.exists("gcam_sdg/output")) dir.create("gcam_sdg/output")
-  if (!dir.exists("gcam_sdg/output/SDG3-Health")) dir.create("gcam_sdg/output/SDG3-Health")
-  if (!dir.exists("gcam_sdg/output/SDG3-Health/mort.list")) dir.create("gcam_sdg/output/SDG3-Health/mort.list")
-  if (!dir.exists("gcam_sdg/output/SDG3-Health/mort.fin")) dir.create("gcam_sdg/output/SDG3-Health/mort.fin")
-  if (!dir.exists("gcam_sdg/output/SDG3-Health/figures")) dir.create("gcam_sdg/output/SDG3-Health/figures")
-  if (!dir.exists("gcam_sdg/output/SDG3-Health/maps")) dir.create("gcam_sdg/output/SDG3-Health/maps")
+  if (!dir.exists("gcamsdg/output")) dir.create("gcamsdg/output")
+  if (!dir.exists("gcamsdg/output/SDG3-Health")) dir.create("gcamsdg/output/SDG3-Health")
+  if (!dir.exists("gcamsdg/output/SDG3-Health/mort.list")) dir.create("gcamsdg/output/SDG3-Health/mort.list")
+  if (!dir.exists("gcamsdg/output/SDG3-Health/mort.fin")) dir.create("gcamsdg/output/SDG3-Health/mort.fin")
+  if (!dir.exists("gcamsdg/output/SDG3-Health/figures")) dir.create("gcamsdg/output/SDG3-Health/figures")
+  if (!dir.exists("gcamsdg/output/SDG3-Health/maps")) dir.create("gcamsdg/output/SDG3-Health/maps")
   
   mort <- NULL
   for (i in rgcam::listScenarios(prj)) {
@@ -160,7 +169,7 @@ get_sdg3_health <- function(prj, saveOutput = T, makeFigures = F, final_db_year 
   #--------------------
  
   print('Save Output')
-  if (saveOutput) write.csv(mort, file = file.path('gcam_sdg/output/SDG3-Health/mort.fin',paste0('mort_fin_',gsub("\\.dat$", "", prj_name), ".csv")), row.names = F)
+  if (saveOutput) write.csv(mort, file = file.path('gcamsdg/output/SDG3-Health/mort.fin',paste0('mort_fin_',gsub("\\.dat$", "", prj_name), ".csv")), row.names = F)
   
   return(invisible(mort))
   
